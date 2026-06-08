@@ -18,13 +18,9 @@
     "zod": "^3.22.4",
     "axios": "^1.6.2",
     "socket.io-client": "^4.7.2",
-    "@radix-ui/react-slot": "^2.0.2",
-    "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "lucide-react": "^0.294.0",
-    "tailwind-merge": "^2.2.1",
-    "@farmlink/shared-types": "*",
-    "@farmlink/validation": "*"
+    "@farmlink/shared-types": "file:../../packages/shared-types",
+    "@farmlink/validation": "file:../../packages/validation"
   },
   "devDependencies": {
     "typescript": "^5.3.3",
