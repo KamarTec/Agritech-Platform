@@ -1,0 +1,317 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id              String      @id @default(uuid())
+  email           String      @unique
+  password        String
+  role            String      // FARMER | RETAILER | INVESTOR | SUPPLIER | ADMIN
+  fullName        String?
+  phone           String?
+  location        String?
+  latitude        Float?
+  longitude       Float?
+  kycStatus       String      @default("PENDING") // PENDING | VERIFIED | REJECTED
+  trustScore      Int         @default(0)
+  avatarUrl       String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  farms           Farm[]
+  investments     Investment[]
+  demandRequests  DemandRequest[]
+  bids            Bid[]
+  sentMessages    Message[]
+  subscriptions   Subscription[]
+  boosts          BoostRecord[]
+  cropDiagnoses   CropDiagnosis[]
+  loanReferrals   LoanReferral[]
+  insuranceContributions InsuranceContribution[]
+  supplierListings SupplierListing[]
+}
+
+model Farm {
+  id          String      @id @default(uuid())
+  farmerId    String
+  farmer      Profile     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  location    String
+  latitude    Float?
+  longitude   Float?
+  photos      String[]
+  verified    Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  listings    Listing[]
+  campaigns   Campaign[]
+
+  @@index([farmerId])
+}
+
+model Listing {
+  id          String      @id @default(uuid())
+  farmId      String
+  farm        Farm        @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  crop        String
+  quantityKg  Float
+  pricePerKg  Float
+  harvestDate DateTime?
+  photos      String[]
+  status      String      @default("ACTIVE") // ACTIVE | SOLD | EXPIRED
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  searchVector String?
+
+  @@index([farmId])
+  @@index([crop])
+  @@index([status])
+}
+
+model Campaign {
+  id              String      @id @default(uuid())
+  farmId          String
+  farm            Farm        @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  crop            String
+  description     String
+  targetAmount    Float
+  raisedAmount    Float       @default(0)
+  profitSharePct  Float
+  harvestDate     DateTime
+  status          String      @default("DRAFT") // DRAFT | ACTIVE | FUNDED | HARVESTED | SETTLED
+  photos          String[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  investments     Investment[]
+
+  @@index([farmId])
+  @@index([status])
+}
+
+model Investment {
+  id                  String      @id @default(uuid())
+  campaignId          String
+  campaign            Campaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  investorId          String
+  investor            Profile     @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  amount              Float
+  sharePct            Float
+  paystackReference   String?
+  status              String      @default("ACTIVE") // ACTIVE | RETURNED | PAID_OUT
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([campaignId])
+  @@index([investorId])
+}
+
+model DemandRequest {
+  id               String      @id @default(uuid())
+  retailerId       String
+  retailer         Profile     @relation(fields: [retailerId], references: [id], onDelete: Cascade)
+  crop             String
+  quantityKg       Float
+  maxPricePerKg    Float
+  deliveryLocation String
+  neededBy         DateTime
+  status           String      @default("OPEN") // OPEN | BIDDING | AWARDED | IN_DELIVERY | COMPLETED
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  bids             Bid[]
+
+  @@index([retailerId])
+  @@index([crop])
+  @@index([status])
+}
+
+model Bid {
+  id              String      @id @default(uuid())
+  demandId        String
+  demand          DemandRequest @relation(fields: [demandId], references: [id], onDelete: Cascade)
+  farmerId        String
+  farmer          Profile     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  offeredPrice    Float
+  message         String?
+  status          String      @default("PENDING") // PENDING | ACCEPTED | REJECTED
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([demandId])
+  @@index([farmerId])
+}
+
+model Transaction {
+  id                  String      @id @default(uuid())
+  type                String      // MARKETPLACE | INVESTMENT | INSURANCE
+  buyerId             String
+  sellerId            String
+  amount              Float
+  paystackReference   String?
+  escrowStatus        String      @default("HELD") // HELD | RELEASED | DISPUTED | REFUNDED
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model MessageThread {
+  id               String      @id @default(uuid())
+  participantIds   String[]
+  contextType      String?     // listing | campaign | demand
+  contextId        String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  messages         Message[]
+}
+
+model Message {
+  id          String      @id @default(uuid())
+  threadId    String
+  thread      MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId    String
+  sender      Profile     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content     String
+  read        Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+
+  @@index([threadId])
+  @@index([senderId])
+}
+
+model Notification {
+  id          String      @id @default(uuid())
+  userId      String
+  type        String
+  title       String
+  body        String
+  read        Boolean     @default(false)
+  actionUrl   String?
+  createdAt   DateTime    @default(now())
+}
+
+model CropDiagnosis {
+  id          String      @id @default(uuid())
+  farmerId    String
+  farmer      Profile     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  imageUrl    String
+  result      Json        // Gemini structured response
+  createdAt   DateTime    @default(now())
+
+  @@index([farmerId])
+}
+
+model PriceHistory {
+  id          String      @id @default(uuid())
+  crop        String
+  region      String
+  pricePerKg  Float
+  recordedDate DateTime
+  createdAt   DateTime    @default(now())
+
+  @@index([crop])
+  @@index([region])
+}
+
+model SubscriptionPlan {
+  id              String      @id @default(uuid())
+  name            String      @unique
+  priceGhs        Float
+  paystackPlanCode String?
+  features        Json
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  subscriptions   Subscription[]
+}
+
+model Subscription {
+  id                  String      @id @default(uuid())
+  userId              String      @unique
+  user                Profile     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId              String
+  plan                SubscriptionPlan @relation(fields: [planId], references: [id])
+  paystackSubCode     String?
+  status              String      @default("ACTIVE") // ACTIVE | CANCELLED | PAST_DUE
+  currentPeriodEnd    DateTime
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([planId])
+}
+
+model BoostRecord {
+  id          String      @id @default(uuid())
+  userId      String
+  user        Profile     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  targetType  String      // listing | campaign | demand | featured_banner
+  targetId    String
+  priceGhs    Float
+  startsAt    DateTime
+  expiresAt   DateTime
+  active      Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PlatformFee {
+  id                  String      @id @default(uuid())
+  transactionId       String
+  feeType             String      // marketplace | escrow | campaign | contract
+  feeAmount           Float
+  paystackReference   String?
+  createdAt           DateTime    @default(now())
+}
+
+model SupplierListing {
+  id          String      @id @default(uuid())
+  supplierId  String
+  supplier    Profile     @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  name        String
+  category    String      // fertilizer | seeds | pesticides | equipment
+  description String
+  pricePerUnit Float
+  unit        String
+  photos      String[]
+  status      String      @default("ACTIVE")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([supplierId])
+  @@index([category])
+}
+
+model LoanReferral {
+  id          String      @id @default(uuid())
+  farmerId    String
+  farmer      Profile     @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  partnerId   String
+  status      String      // clicked | applied | approved | paid_out
+  referralFee Float?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([farmerId])
+}
+
+model InsuranceContribution {
+  id             String      @id @default(uuid())
+  contributorId  String
+  contributor    Profile     @relation(fields: [contributorId], references: [id], onDelete: Cascade)
+  monthlyAmount  Float
+  active         Boolean     @default(true)
+  joinedAt       DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([contributorId])
+}

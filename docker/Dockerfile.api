@@ -1,0 +1,33 @@
+FROM node:18-alpine AS base
+RUN npm install -g pnpm
+WORKDIR /app
+
+# Install dependencies
+FROM base AS deps
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY packages/validation/package.json ./packages/validation/
+RUN pnpm install --frozen-lockfile
+
+# Build stage
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN cd apps/api && pnpm build
+
+# Runtime stage
+FROM base AS runner
+ENV NODE_ENV production
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/node_modules ./node_modules
+COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/.env* ./
+
+USER nestjs
+EXPOSE 3001
+
+CMD ["node", "dist/main"]
