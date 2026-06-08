@@ -47,8 +47,8 @@
     "dotenv": "^16.3.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "@farmlink/shared-types": "workspace:*",
-    "@farmlink/validation": "workspace:*"
+    "@farmlink/shared-types": "*",
+    "@farmlink/validation": "*"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.2.1",
