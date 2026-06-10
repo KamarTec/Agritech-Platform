@@ -1,11 +1,30 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
-  title: 'FarmLink - Connect. Invest. Grow.',
-  description: 'Connect farmers, retailers, and investors on a single trusted platform. Invest in harvests, find quality produce, and support agricultural growth.',
-  icons: {
-    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="75" font-size="75" fill="%2316a34a">🌾</text></svg>',
+  title: 'FarmLink — Connect. Invest. Grow.',
+  description:
+    'FarmLink connects farmers, retailers, and investors on one trusted platform. Invest in harvests, source quality produce, diagnose crops with AI, and grow with secure escrow payments.',
+  keywords: [
+    'agritech',
+    'farming',
+    'harvest investment',
+    'agriculture marketplace',
+    'Ghana farming',
+    'crop investment',
+  ],
+  openGraph: {
+    title: 'FarmLink — Connect. Invest. Grow.',
+    description:
+      'The trusted platform connecting farmers, retailers, and investors.',
+    type: 'website',
   },
 }
 
@@ -15,8 +34,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="antialiased">{children}</body>
+    <html lang="en" className={inter.variable}>
+      <body className="font-sans antialiased bg-white text-gray-900">
+        {children}
+      </body>
     </html>
   )
 }

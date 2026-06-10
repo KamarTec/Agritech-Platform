@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -20,11 +24,26 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@farmlink/shared-types": ["../../packages/shared-types"],
-      "@farmlink/validation": ["../../packages/validation"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@farmlink/shared-types": [
+        "../../packages/shared-types"
+      ],
+      "@farmlink/validation": [
+        "../../packages/validation"
+      ]
+    },
+    "allowJs": true,
+    "moduleResolution": "node"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
