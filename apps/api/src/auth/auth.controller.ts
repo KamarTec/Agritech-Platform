@@ -1,24 +1,28 @@
-import { Controller, Post, Body } from '@nestjs/common'
-import { AuthService } from './auth.service'
+import { Body, Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common'
+import { AuthService, AuthResult, JwtPayload, SafeProfile } from './auth.service'
+import { RegisterDto } from './dto/register.dto'
+import { LoginDto } from './dto/login.dto'
+import { JwtAuthGuard } from './jwt-auth.guard'
+import { CurrentUser } from './current-user.decorator'
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(
-    @Body('email') email: string,
-    @Body('password') password: string,
-    @Body('role') role: string
-  ) {
-    return this.authService.register(email, password, role)
+  register(@Body() dto: RegisterDto): Promise<AuthResult> {
+    return this.authService.register(dto)
   }
 
   @Post('login')
-  async login(
-    @Body('email') email: string,
-    @Body('password') password: string
-  ) {
-    return this.authService.login(email, password)
+  @HttpCode(200)
+  login(@Body() dto: LoginDto): Promise<AuthResult> {
+    return this.authService.login(dto)
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  me(@CurrentUser() user: JwtPayload): Promise<SafeProfile> {
+    return this.authService.me(user.sub)
   }
 }

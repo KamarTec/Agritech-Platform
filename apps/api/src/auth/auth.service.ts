@@ -1,51 +1,114 @@
-import { Injectable } from '@nestjs/common'
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { PrismaService } from '../prisma/prisma.service'
 import * as bcrypt from 'bcryptjs'
+import { PrismaService } from '../prisma/prisma.service'
+import { RegisterDto } from './dto/register.dto'
+import { LoginDto } from './dto/login.dto'
+
+export interface JwtPayload {
+  sub: string
+  email: string
+  role: string
+}
+
+export interface SafeProfile {
+  id: string
+  email: string
+  role: string
+  fullName: string | null
+  kycStatus: string
+  trustScore: number
+  avatarUrl: string | null
+  createdAt: Date
+}
+
+export interface AuthResult {
+  user: SafeProfile
+  token: string
+}
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService
   ) {}
 
-  async register(email: string, password: string, role: string) {
-    const hashedPassword = await bcrypt.hash(password, 10)
+  async register(dto: RegisterDto): Promise<AuthResult> {
+    const email = dto.email.toLowerCase().trim()
+
+    const existing = await this.prisma.profile.findUnique({ where: { email } })
+    if (existing) {
+      throw new ConflictException('An account with this email already exists')
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10)
 
     const user = await this.prisma.profile.create({
       data: {
         email,
         password: hashedPassword,
-        role,
+        fullName: dto.fullName.trim(),
+        role: dto.role,
       },
     })
 
-    const token = this.jwtService.sign({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    })
-
-    return { user, token }
+    return { user: this.sanitize(user), token: this.signToken(user) }
   }
 
-  async login(email: string, password: string) {
-    const user = await this.prisma.profile.findUnique({
-      where: { email },
-    })
+  async login(dto: LoginDto): Promise<AuthResult> {
+    const email = dto.email.toLowerCase().trim()
 
-    if (!user) throw new Error('User not found')
+    const user = await this.prisma.profile.findUnique({ where: { email } })
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password')
+    }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-    if (!isPasswordValid) throw new Error('Invalid password')
+    const passwordValid = await bcrypt.compare(dto.password, user.password)
+    if (!passwordValid) {
+      throw new UnauthorizedException('Invalid email or password')
+    }
 
-    const token = this.jwtService.sign({
-      sub: user.id,
+    return { user: this.sanitize(user), token: this.signToken(user) }
+  }
+
+  async me(userId: string): Promise<SafeProfile> {
+    const user = await this.prisma.profile.findUnique({ where: { id: userId } })
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+    return this.sanitize(user)
+  }
+
+  private signToken(user: { id: string; email: string; role: string }): string {
+    const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role }
+    return this.jwtService.sign(payload)
+  }
+
+  private sanitize(user: {
+    id: string
+    email: string
+    role: string
+    fullName: string | null
+    kycStatus: string
+    trustScore: number
+    avatarUrl: string | null
+    createdAt: Date
+  }): SafeProfile {
+    return {
+      id: user.id,
       email: user.email,
       role: user.role,
-    })
-
-    return { user, token }
+      fullName: user.fullName,
+      kycStatus: user.kycStatus,
+      trustScore: user.trustScore,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+    }
   }
 }

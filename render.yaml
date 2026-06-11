@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: farmlink-api
+    runtime: node
+    rootDir: apps/api
+    plan: free
+    buildCommand: npm install && npm run build && npx prisma db push --accept-data-loss
+    startCommand: node dist/main.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
