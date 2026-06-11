@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { api, ApiError } from '@/lib/api'
+import { saveAuth } from '@/lib/auth'
 
 const inputClasses =
   'w-full px-4 py-3 rounded-xl border border-gray-300 text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow'
@@ -20,11 +22,15 @@ export default function LoginPage() {
     setError(null)
     setLoading(true)
     try {
-      // TODO: wire to NestJS POST /auth/login once the API is connected
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      const result = await api.login({ email, password })
+      saveAuth(result)
       router.push('/dashboard')
-    } catch {
-      setError('Invalid email or password. Please try again.')
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Could not reach the server. Please try again.'
+      )
       setLoading(false)
     }
   }

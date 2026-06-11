@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { api, ApiError } from '@/lib/api'
+import { saveAuth } from '@/lib/auth'
 
 type Role = 'FARMER' | 'RETAILER' | 'INVESTOR'
 
@@ -71,13 +73,23 @@ export default function RegisterPage() {
       return
     }
 
+    if (!role) {
+      setError('Please select a role first.')
+      setStep(1)
+      return
+    }
+
     setLoading(true)
     try {
-      // TODO: wire to NestJS POST /auth/register once the API is connected
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      const result = await api.register({ email, password, fullName, role })
+      saveAuth(result)
       router.push('/dashboard')
-    } catch {
-      setError('Something went wrong. Please try again.')
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : 'Could not reach the server. Please try again.'
+      )
       setLoading(false)
     }
   }
