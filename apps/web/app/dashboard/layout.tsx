@@ -60,11 +60,10 @@ const NAV_ITEMS: NavItem[] = [
     soon: true,
   },
   {
-    href: '#demands',
+    href: '/dashboard/demands',
     label: 'Demand Requests',
     icon: 'M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4',
     roles: ['RETAILER', 'FARMER'],
-    soon: true,
   },
   {
     href: '#crop-doctor',

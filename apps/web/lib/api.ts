@@ -60,6 +60,50 @@ export interface PaginatedListings {
   pages: number
 }
 
+export type DemandStatus = 'OPEN' | 'BIDDING' | 'AWARDED' | 'IN_DELIVERY' | 'COMPLETED'
+export type BidStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED'
+
+export interface PersonSummary {
+  id: string
+  fullName: string | null
+  location: string | null
+  trustScore: number
+  kycStatus?: string
+}
+
+export interface DemandRequest {
+  id: string
+  retailerId: string
+  crop: string
+  quantityKg: number
+  maxPricePerKg: number
+  deliveryLocation: string
+  neededBy: string
+  status: DemandStatus
+  createdAt: string
+  retailer?: PersonSummary
+  _count?: { bids: number }
+}
+
+export interface Bid {
+  id: string
+  demandId: string
+  farmerId: string
+  offeredPrice: number
+  message: string | null
+  status: BidStatus
+  createdAt: string
+  farmer?: PersonSummary
+  demand?: DemandRequest
+}
+
+export interface PaginatedDemands {
+  items: DemandRequest[]
+  total: number
+  page: number
+  pages: number
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,

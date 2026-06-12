@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
 
   // FRONTEND_URL supports a comma-separated list; values are sanitized in case
   // quotes/whitespace sneak in via dashboard env vars (invalid header chars crash CORS).
-  const corsOrigins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  const corsOrigins = (process.env.FRONTEND_URL || 'http://localhost:3003')
     .split(',')
     .map((origin) => origin.trim().replace(/^["']+|["']+$/g, '').replace(/\/+$/, ''))
     .filter(Boolean)

@@ -5,6 +5,7 @@ import { PrismaModule } from './prisma/prisma.module'
 import { AuthModule } from './auth/auth.module'
 import { FarmsModule } from './farms/farms.module'
 import { ListingsModule } from './listings/listings.module'
+import { DemandsModule } from './demands/demands.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ListingsModule } from './listings/listings.module'
     AuthModule,
     FarmsModule,
     ListingsModule,
+    DemandsModule,
   ],
   controllers: [AppController],
   providers: [],
