@@ -7,6 +7,8 @@ import { FarmsModule } from './farms/farms.module'
 import { ListingsModule } from './listings/listings.module'
 import { DemandsModule } from './demands/demands.module'
 import { CampaignsModule } from './campaigns/campaigns.module'
+import { CropDoctorModule } from './crop-doctor/crop-doctor.module'
+import { TransactionsModule } from './transactions/transactions.module'
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { CampaignsModule } from './campaigns/campaigns.module'
     ListingsModule,
     DemandsModule,
     CampaignsModule,
+    CropDoctorModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [],

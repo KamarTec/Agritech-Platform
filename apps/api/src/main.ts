@@ -4,7 +4,8 @@ import helmet from 'helmet'
 import { AppModule } from './app.module'
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule)
+  // rawBody is required to verify Paystack webhook HMAC signatures
+  const app = await NestFactory.create(AppModule, { rawBody: true })
 
   app.use(helmet())
 

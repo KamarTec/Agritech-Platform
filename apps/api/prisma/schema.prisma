@@ -155,11 +155,18 @@ model Transaction {
   type                String      // MARKETPLACE | INVESTMENT | INSURANCE
   buyerId             String
   sellerId            String
+  listingId           String?
+  crop                String?
+  quantityKg          Float?
   amount              Float
-  paystackReference   String?
-  escrowStatus        String      @default("HELD") // HELD | RELEASED | DISPUTED | REFUNDED
+  platformFee         Float       @default(0)
+  paystackReference   String?     @unique
+  escrowStatus        String      @default("PENDING") // PENDING | HELD | RELEASED | DISPUTED | REFUNDED
   createdAt           DateTime    @default(now())
   updatedAt           DateTime    @updatedAt
+
+  @@index([buyerId])
+  @@index([sellerId])
 }
 
 model MessageThread {

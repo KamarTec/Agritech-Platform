@@ -145,6 +145,54 @@ export interface PaginatedCampaigns {
   pages: number
 }
 
+export interface Diagnosis {
+  healthy: boolean
+  issue: string
+  issueType: 'disease' | 'pest' | 'nutrient_deficiency' | 'healthy' | 'unknown'
+  severity: 'none' | 'mild' | 'moderate' | 'severe'
+  confidencePct: number
+  summary: string
+  treatment: string[]
+  prevention: string[]
+  estimatedCostGhs: number
+}
+
+export interface DiagnosisResult {
+  diagnosis: Diagnosis
+  remainingThisMonth: number
+}
+
+export interface CropDiagnosisRecord {
+  id: string
+  farmerId: string
+  imageUrl: string
+  result: Diagnosis
+  createdAt: string
+}
+
+export type EscrowStatus = 'PENDING' | 'HELD' | 'RELEASED' | 'DISPUTED' | 'REFUNDED'
+
+export interface Transaction {
+  id: string
+  type: string
+  buyerId: string
+  sellerId: string
+  listingId: string | null
+  crop: string | null
+  quantityKg: number | null
+  amount: number
+  platformFee: number
+  paystackReference: string | null
+  escrowStatus: EscrowStatus
+  createdAt: string
+}
+
+export interface InitializeOrderResult {
+  transactionId: string
+  authorizationUrl: string
+  reference: string
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -217,5 +265,27 @@ export const api = {
 
   delete<T>(path: string): Promise<T> {
     return request<T>(path, { method: 'DELETE' })
+  },
+
+  /** Multipart upload — browser sets the Content-Type boundary itself. */
+  async upload<T>(path: string, field: string, file: File): Promise<T> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('farmlink_token') : null
+    const formData = new FormData()
+    formData.append(field, file)
+
+    const res = await fetch(`${API_URL}${path}`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    })
+
+    const body = await res.json().catch(() => null)
+    if (!res.ok) {
+      const message = Array.isArray(body?.message)
+        ? body.message[0]
+        : body?.message || `Request failed (${res.status})`
+      throw new ApiError(res.status, message)
+    }
+    return body as T
   },
 }
