@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Bid, DemandRequest, DemandStatus, PaginatedDemands } from '@/lib/api'
-import { useUser } from '../layout'
+import { useUser } from '../user-context'
 
 const inputClasses =
   'w-full px-4 py-3 rounded-xl border border-gray-300 text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow'

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import type { Farm, Listing } from '@/lib/api'
-import { useUser } from './layout'
+import { useUser } from './user-context'
 
 interface Stats {
   farms: number

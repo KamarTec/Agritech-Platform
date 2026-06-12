@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module'
 import { FarmsModule } from './farms/farms.module'
 import { ListingsModule } from './listings/listings.module'
 import { DemandsModule } from './demands/demands.module'
+import { CampaignsModule } from './campaigns/campaigns.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { DemandsModule } from './demands/demands.module'
     FarmsModule,
     ListingsModule,
     DemandsModule,
+    CampaignsModule,
   ],
   controllers: [AppController],
   providers: [],

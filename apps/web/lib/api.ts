@@ -104,6 +104,47 @@ export interface PaginatedDemands {
   pages: number
 }
 
+export type CampaignStatus = 'DRAFT' | 'ACTIVE' | 'FUNDED' | 'HARVESTED' | 'SETTLED'
+export type InvestmentStatus = 'ACTIVE' | 'RETURNED' | 'PAID_OUT'
+
+export interface CampaignFarm extends FarmSummary {
+  farmer?: PersonSummary
+}
+
+export interface Campaign {
+  id: string
+  farmId: string
+  crop: string
+  description: string
+  targetAmount: number
+  raisedAmount: number
+  profitSharePct: number
+  harvestDate: string
+  status: CampaignStatus
+  photos: string[]
+  createdAt: string
+  farm: CampaignFarm
+  _count?: { investments: number }
+}
+
+export interface Investment {
+  id: string
+  campaignId: string
+  investorId: string
+  amount: number
+  sharePct: number
+  status: InvestmentStatus
+  createdAt: string
+  campaign?: Campaign
+}
+
+export interface PaginatedCampaigns {
+  items: Campaign[]
+  total: number
+  page: number
+  pages: number
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,

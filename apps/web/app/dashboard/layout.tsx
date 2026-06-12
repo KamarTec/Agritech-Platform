@@ -2,20 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Logo } from '@/components/logo'
 import { clearAuth, getStoredUser } from '@/lib/auth'
 import type { User } from '@/lib/api'
-
-/* ---------- user context so child pages can read the session ---------- */
-
-const UserContext = createContext<User | null>(null)
-
-export function useUser(): User {
-  const user = useContext(UserContext)
-  if (!user) throw new Error('useUser must be used inside the dashboard')
-  return user
-}
+import { UserContext } from './user-context'
 
 /* ---------- nav config ---------- */
 
@@ -53,11 +44,10 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['FARMER', 'RETAILER', 'INVESTOR', 'SUPPLIER', 'ADMIN'],
   },
   {
-    href: '#campaigns',
+    href: '/dashboard/campaigns',
     label: 'Campaigns',
     icon: 'M3 17l6-6 4 4 8-8m0 0h-5m5 0v5',
     roles: ['FARMER', 'INVESTOR'],
-    soon: true,
   },
   {
     href: '/dashboard/demands',
