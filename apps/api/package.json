@@ -6,7 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prebuild": "rimraf dist",
     "build": "prisma generate && nest build",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
