@@ -16,6 +16,50 @@ export interface AuthResult {
   token: string
 }
 
+export interface Farm {
+  id: string
+  farmerId: string
+  name: string
+  description: string | null
+  location: string
+  latitude: number | null
+  longitude: number | null
+  photos: string[]
+  verified: boolean
+  createdAt: string
+  _count?: { listings: number; campaigns: number }
+}
+
+export interface FarmSummary {
+  id: string
+  name: string
+  location: string
+  verified: boolean
+  farmerId: string
+}
+
+export type ListingStatus = 'ACTIVE' | 'SOLD' | 'EXPIRED'
+
+export interface Listing {
+  id: string
+  farmId: string
+  crop: string
+  quantityKg: number
+  pricePerKg: number
+  harvestDate: string | null
+  photos: string[]
+  status: ListingStatus
+  createdAt: string
+  farm: FarmSummary
+}
+
+export interface PaginatedListings {
+  items: Listing[]
+  total: number
+  page: number
+  pages: number
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,

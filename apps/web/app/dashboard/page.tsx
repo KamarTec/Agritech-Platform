@@ -1,67 +1,137 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Logo } from '@/components/logo'
-import { clearAuth, getStoredUser } from '@/lib/auth'
-import type { User } from '@/lib/api'
+import { api } from '@/lib/api'
+import type { Farm, Listing } from '@/lib/api'
+import { useUser } from './layout'
 
-export default function DashboardPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [checked, setChecked] = useState(false)
+interface Stats {
+  farms: number
+  activeListings: number
+  totalListings: number
+}
+
+export default function OverviewPage() {
+  const user = useUser()
+  const [stats, setStats] = useState<Stats | null>(null)
 
   useEffect(() => {
-    const stored = getStoredUser()
-    if (!stored) {
-      router.replace('/auth/login')
-      return
+    if (user.role !== 'FARMER') return
+    let cancelled = false
+
+    async function load(): Promise<void> {
+      try {
+        const [farms, listings] = await Promise.all([
+          api.get<Farm[]>('/farms/mine'),
+          api.get<Listing[]>('/listings/mine'),
+        ])
+        if (!cancelled) {
+          setStats({
+            farms: farms.length,
+            activeListings: listings.filter((l) => l.status === 'ACTIVE').length,
+            totalListings: listings.length,
+          })
+        }
+      } catch {
+        // stats are non-critical; ignore load failures here
+      }
     }
-    setUser(stored)
-    setChecked(true)
-  }, [router])
 
-  function handleSignOut(): void {
-    clearAuth()
-    router.push('/')
-  }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [user.role])
 
-  if (!checked || !user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-[3px] border-brand-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  const firstName = (user.fullName ?? user.email).split(' ')[0]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 text-center">
-      <Logo />
-      <div className="mt-8 px-4 py-1.5 rounded-full bg-brand-100 text-brand-700 text-sm font-semibold">
-        {user.role}
-      </div>
-      <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-        Welcome, {user.fullName ?? user.email} 👋
+    <div className="max-w-5xl">
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
+        Welcome back, {firstName} 👋
       </h1>
-      <p className="mt-3 text-gray-500 max-w-md">
-        Your account is live. The role-based dashboard (marketplace, campaigns,
-        demand requests) is the next thing we’re building.
+      <p className="mt-1 text-gray-500">
+        {user.role === 'FARMER' && 'Manage your farms and listings, and reach buyers directly.'}
+        {user.role === 'RETAILER' && 'Browse the marketplace and source produce directly from farms.'}
+        {user.role === 'INVESTOR' && 'Harvest campaigns are coming soon — browse the marketplace meanwhile.'}
+        {user.role === 'SUPPLIER' && 'The supplier marketplace is coming soon.'}
+        {user.role === 'ADMIN' && 'Platform administration.'}
       </p>
-      <div className="mt-8 flex gap-3">
-        <Link
-          href="/"
-          className="px-6 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 transition-colors"
-        >
-          Back to home
-        </Link>
-        <button
-          onClick={handleSignOut}
-          className="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold hover:border-gray-400 transition-colors"
-        >
-          Sign out
-        </button>
+
+      {/* Stat cards (farmer) */}
+      {user.role === 'FARMER' && (
+        <div className="mt-8 grid sm:grid-cols-3 gap-4">
+          <StatCard label="My farms" value={stats ? String(stats.farms) : '—'} href="/dashboard/farms" />
+          <StatCard label="Active listings" value={stats ? String(stats.activeListings) : '—'} href="/dashboard/listings" />
+          <StatCard label="Total listings" value={stats ? String(stats.totalListings) : '—'} href="/dashboard/listings" />
+        </div>
+      )}
+
+      {/* Quick actions */}
+      <h2 className="mt-10 text-lg font-bold text-gray-900">Quick actions</h2>
+      <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {user.role === 'FARMER' && (
+          <>
+            <ActionCard
+              href="/dashboard/farms"
+              title="Add a farm"
+              description="Register your farm so you can start posting produce."
+            />
+            <ActionCard
+              href="/dashboard/listings"
+              title="Post a listing"
+              description="List your produce and let buyers find you."
+            />
+          </>
+        )}
+        <ActionCard
+          href="/dashboard/marketplace"
+          title="Browse marketplace"
+          description="See what produce is available right now."
+        />
+      </div>
+
+      {/* Coming soon teaser */}
+      <div className="mt-10 rounded-2xl border border-dashed border-gray-300 bg-white p-6">
+        <h3 className="font-bold text-gray-900">Coming soon to FarmLink</h3>
+        <p className="mt-1 text-sm text-gray-500 max-w-2xl">
+          Harvest investment campaigns, AI Crop Doctor, retailer demand requests with bidding, and
+          escrow-protected payments are on the way. You&apos;ll see them appear in the sidebar as they launch.
+        </p>
       </div>
     </div>
+  )
+}
+
+function StatCard({ label, value, href }: { label: string; value: string; href: string }) {
+  return (
+    <Link
+      href={href}
+      className="rounded-2xl bg-white border border-gray-200 p-5 hover:border-brand-300 hover:shadow-md transition-all"
+    >
+      <div className="text-sm font-medium text-gray-500">{label}</div>
+      <div className="mt-1 text-3xl font-bold text-gray-900">{value}</div>
+    </Link>
+  )
+}
+
+function ActionCard({ href, title, description }: { href: string; title: string; description: string }) {
+  return (
+    <Link
+      href={href}
+      className="group rounded-2xl bg-white border border-gray-200 p-5 hover:border-brand-300 hover:shadow-md transition-all"
+    >
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-gray-900">{title}</h3>
+        <svg
+          className="w-5 h-5 text-gray-300 group-hover:text-brand-600 group-hover:translate-x-0.5 transition-all"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"
+        >
+          <path d="M5 12h14m-6-6 6 6-6 6" />
+        </svg>
+      </div>
+      <p className="mt-1 text-sm text-gray-500">{description}</p>
+    </Link>
   )
 }
