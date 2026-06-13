@@ -152,10 +152,11 @@ model Bid {
 
 model Transaction {
   id                  String      @id @default(uuid())
-  type                String      // MARKETPLACE | INVESTMENT | INSURANCE
+  type                String      // MARKETPLACE | DEMAND | INVESTMENT | INSURANCE
   buyerId             String
   sellerId            String
   listingId           String?
+  bidId               String?     @unique
   crop                String?
   quantityKg          Float?
   amount              Float

@@ -1,11 +1,15 @@
 import { Type } from 'class-transformer'
-import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator'
+import { IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator'
 
 export class QueryListingsDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)
   crop?: string
+
+  @IsOptional()
+  @IsUUID()
+  farmId?: string
 
   @IsOptional()
   @IsString()

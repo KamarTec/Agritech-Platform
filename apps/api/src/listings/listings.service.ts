@@ -9,6 +9,19 @@ const farmSummary = {
   select: { id: true, name: true, location: true, verified: true, farmerId: true },
 } as const
 
+const farmWithFarmer = {
+  select: {
+    id: true,
+    name: true,
+    location: true,
+    verified: true,
+    farmerId: true,
+    farmer: {
+      select: { id: true, fullName: true, trustScore: true, kycStatus: true, location: true },
+    },
+  },
+} as const
+
 export interface PaginatedListings {
   items: Listing[]
   total: number
@@ -50,6 +63,7 @@ export class ListingsService {
 
     const where: Prisma.ListingWhereInput = {
       status: 'ACTIVE',
+      ...(query.farmId ? { farmId: query.farmId } : {}),
       ...(query.crop
         ? { crop: { contains: query.crop, mode: 'insensitive' } }
         : {}),
@@ -89,7 +103,7 @@ export class ListingsService {
   async findOne(id: string): Promise<Listing> {
     const listing = await this.prisma.listing.findUnique({
       where: { id },
-      include: { farm: farmSummary },
+      include: { farm: farmWithFarmer },
     })
     if (!listing) {
       throw new NotFoundException('Listing not found')

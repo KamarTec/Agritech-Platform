@@ -1,0 +1,33 @@
+export function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+export function timeAgo(iso: string): string {
+  const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
+  if (seconds < 3600) return `${Math.max(1, Math.floor(seconds / 60))}m ago`
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+  return `${Math.floor(seconds / 86400)}d ago`
+}
+
+export function daysUntil(iso: string): number {
+  return Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86400000))
+}
+
+export function formatGhs(amount: number): string {
+  return `GH₵ ${amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+}
+
+export function cropEmoji(crop: string): string {
+  const c = crop.toLowerCase()
+  if (c.includes('tomato')) return '🍅'
+  if (c.includes('maize') || c.includes('corn')) return '🌽'
+  if (c.includes('onion')) return '🧅'
+  if (c.includes('pepper') || c.includes('chil')) return '🌶️'
+  if (c.includes('plantain') || c.includes('banana')) return '🍌'
+  if (c.includes('rice')) return '🍚'
+  if (c.includes('yam') || c.includes('potato') || c.includes('cassava')) return '🍠'
+  if (c.includes('mango')) return '🥭'
+  if (c.includes('pineapple')) return '🍍'
+  if (c.includes('cocoa')) return '🍫'
+  return '🌾'
+}

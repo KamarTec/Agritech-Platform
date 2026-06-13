@@ -23,6 +23,11 @@ class InitializeOrderDto {
   quantityKg!: number
 }
 
+class InitializeBidOrderDto {
+  @IsUUID()
+  bidId!: string
+}
+
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
 export class TransactionsController {
@@ -39,6 +44,14 @@ export class TransactionsController {
       dto.listingId,
       dto.quantityKg
     )
+  }
+
+  @Post('initialize-bid')
+  initializeBid(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: InitializeBidOrderDto
+  ): Promise<InitializeOrderResult> {
+    return this.transactionsService.initializeBidOrder(user.sub, user.email, dto.bidId)
   }
 
   @Get('mine')

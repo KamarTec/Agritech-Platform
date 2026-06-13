@@ -90,6 +90,77 @@ export class TransactionsService {
     }
   }
 
+  /** Retailer pays the accepted bid on their demand request through escrow. */
+  async initializeBidOrder(
+    buyerId: string,
+    buyerEmail: string,
+    bidId: string
+  ): Promise<InitializeOrderResult> {
+    const bid = await this.prisma.bid.findUnique({
+      where: { id: bidId },
+      include: { demand: true },
+    })
+    if (!bid) {
+      throw new NotFoundException('Bid not found')
+    }
+    if (bid.status !== 'ACCEPTED') {
+      throw new BadRequestException('Only accepted bids can be paid')
+    }
+    if (bid.demand.retailerId !== buyerId) {
+      throw new ForbiddenException('Only the retailer who owns this demand can pay')
+    }
+    if (bid.demand.status !== 'AWARDED') {
+      throw new BadRequestException('This demand is not awaiting payment')
+    }
+
+    const existing = await this.prisma.transaction.findUnique({ where: { bidId } })
+    if (existing && existing.escrowStatus !== 'PENDING') {
+      throw new BadRequestException('This bid has already been paid')
+    }
+
+    const amount = Math.round(bid.offeredPrice * bid.demand.quantityKg * 100) / 100
+    const platformFee =
+      Math.round(amount * ((MARKETPLACE_FEE_PCT + ESCROW_FEE_PCT) / 100) * 100) / 100
+
+    const frontendUrl = (this.config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000')
+      .split(',')[0]
+      .trim()
+
+    const init = await this.paystack.initialize(
+      buyerEmail,
+      amount,
+      { bidId, demandId: bid.demandId, buyerId, sellerId: bid.farmerId, type: 'DEMAND' },
+      `${frontendUrl}/dashboard/orders`
+    )
+
+    // Reuse an abandoned PENDING row with a fresh reference instead of duplicating.
+    const transaction = existing
+      ? await this.prisma.transaction.update({
+          where: { id: existing.id },
+          data: { paystackReference: init.reference, amount, platformFee },
+        })
+      : await this.prisma.transaction.create({
+          data: {
+            type: 'DEMAND',
+            buyerId,
+            sellerId: bid.farmerId,
+            bidId,
+            crop: bid.demand.crop,
+            quantityKg: bid.demand.quantityKg,
+            amount,
+            platformFee,
+            paystackReference: init.reference,
+            escrowStatus: 'PENDING',
+          },
+        })
+
+    return {
+      transactionId: transaction.id,
+      authorizationUrl: init.authorizationUrl,
+      reference: init.reference,
+    }
+  }
+
   /** Buyer returns from Paystack checkout — verify and move to HELD. */
   async verifyPayment(reference: string): Promise<Transaction> {
     const transaction = await this.prisma.transaction.findUnique({
@@ -153,6 +224,19 @@ export class TransactionsService {
       })
     }
 
+    if (transaction.bidId) {
+      const bid = await this.prisma.bid.findUnique({
+        where: { id: transaction.bidId },
+        select: { demandId: true },
+      })
+      if (bid) {
+        await this.prisma.demandRequest.update({
+          where: { id: bid.demandId },
+          data: { status: 'IN_DELIVERY' },
+        })
+      }
+    }
+
     return updated
   }
 
@@ -173,10 +257,25 @@ export class TransactionsService {
       )
     }
 
-    return this.prisma.transaction.update({
+    const updated = await this.prisma.transaction.update({
       where: { id: transactionId },
       data: { escrowStatus: 'RELEASED' },
     })
+
+    if (transaction.bidId) {
+      const bid = await this.prisma.bid.findUnique({
+        where: { id: transaction.bidId },
+        select: { demandId: true },
+      })
+      if (bid) {
+        await this.prisma.demandRequest.update({
+          where: { id: bid.demandId },
+          data: { status: 'COMPLETED' },
+        })
+      }
+    }
+
+    return updated
   }
 
   /** Either party can flag a dispute on a held payment. */

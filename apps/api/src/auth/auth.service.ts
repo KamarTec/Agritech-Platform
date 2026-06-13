@@ -9,6 +9,8 @@ import * as bcrypt from 'bcryptjs'
 import { PrismaService } from '../prisma/prisma.service'
 import { RegisterDto } from './dto/register.dto'
 import { LoginDto } from './dto/login.dto'
+import { UpdateProfileDto } from './dto/update-profile.dto'
+import { ChangePasswordDto } from './dto/change-password.dto'
 
 export interface JwtPayload {
   sub: string
@@ -21,6 +23,8 @@ export interface SafeProfile {
   email: string
   role: string
   fullName: string | null
+  phone: string | null
+  location: string | null
   kycStatus: string
   trustScore: number
   avatarUrl: string | null
@@ -85,6 +89,38 @@ export class AuthService {
     return this.sanitize(user)
   }
 
+  async updateProfile(userId: string, dto: UpdateProfileDto): Promise<SafeProfile> {
+    const user = await this.prisma.profile.update({
+      where: { id: userId },
+      data: {
+        ...(dto.fullName !== undefined ? { fullName: dto.fullName.trim() } : {}),
+        ...(dto.phone !== undefined ? { phone: dto.phone.trim() || null } : {}),
+        ...(dto.location !== undefined ? { location: dto.location.trim() || null } : {}),
+      },
+    })
+    return this.sanitize(user)
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<{ changed: true }> {
+    const user = await this.prisma.profile.findUnique({ where: { id: userId } })
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    const passwordValid = await bcrypt.compare(dto.currentPassword, user.password)
+    if (!passwordValid) {
+      throw new UnauthorizedException('Current password is incorrect')
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10)
+    await this.prisma.profile.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    })
+
+    return { changed: true }
+  }
+
   private signToken(user: { id: string; email: string; role: string }): string {
     const payload: JwtPayload = { sub: user.id, email: user.email, role: user.role }
     return this.jwtService.sign(payload)
@@ -95,6 +131,8 @@ export class AuthService {
     email: string
     role: string
     fullName: string | null
+    phone: string | null
+    location: string | null
     kycStatus: string
     trustScore: number
     avatarUrl: string | null
@@ -105,6 +143,8 @@ export class AuthService {
       email: user.email,
       role: user.role,
       fullName: user.fullName,
+      phone: user.phone,
+      location: user.location,
       kycStatus: user.kycStatus,
       trustScore: user.trustScore,
       avatarUrl: user.avatarUrl,

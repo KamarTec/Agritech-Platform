@@ -70,6 +70,7 @@ export class CampaignsService {
 
     const where: Prisma.CampaignWhereInput = {
       status: { in: ['ACTIVE', 'FUNDED'] },
+      ...(query.farmId ? { farmId: query.farmId } : {}),
       ...(query.crop ? { crop: { contains: query.crop, mode: 'insensitive' } } : {}),
     }
 

@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, CampaignStatus, Farm, Investment, PaginatedCampaigns } from '@/lib/api'
@@ -195,7 +196,12 @@ function FarmerView() {
             <div key={campaign.id} className="rounded-2xl bg-white border border-gray-200 p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="font-bold text-gray-900">{campaign.crop} — {campaign.farm.name}</h3>
+                  <Link
+                    href={`/dashboard/campaigns/${campaign.id}`}
+                    className="font-bold text-gray-900 hover:text-brand-700 transition-colors"
+                  >
+                    {campaign.crop} — {campaign.farm.name}
+                  </Link>
                   <p className="mt-0.5 text-sm text-gray-500">
                     Harvest {formatDate(campaign.harvestDate)} · {campaign.profitSharePct}% profit share
                   </p>
@@ -458,7 +464,12 @@ function InvestorView() {
               <div key={campaign.id} className="rounded-2xl bg-white border border-gray-200 p-5 flex flex-col">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-bold text-gray-900">{campaign.crop}</h3>
+                    <Link
+                      href={`/dashboard/campaigns/${campaign.id}`}
+                      className="font-bold text-gray-900 hover:text-brand-700 transition-colors"
+                    >
+                      {campaign.crop}
+                    </Link>
                     <p className="mt-0.5 text-sm text-gray-500">
                       {campaign.farm.name} · {campaign.farm.location}
                       {campaign.farm.verified && <span className="text-brand-600 font-bold"> ✓</span>}
@@ -467,7 +478,11 @@ function InvestorView() {
                   <StatusBadge status={campaign.status} />
                 </div>
 
-                <p className="mt-3 text-sm text-gray-500 line-clamp-2">{campaign.description}</p>
+                <Link href={`/dashboard/campaigns/${campaign.id}`} className="block">
+                  <p className="mt-3 text-sm text-gray-500 line-clamp-2 hover:text-gray-700 transition-colors">
+                    {campaign.description}
+                  </p>
+                </Link>
 
                 <div className="mt-4">
                   <ProgressBar raised={campaign.raisedAmount} target={campaign.targetAmount} />

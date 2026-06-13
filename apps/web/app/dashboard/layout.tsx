@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Logo } from '@/components/logo'
-import { clearAuth, getStoredUser } from '@/lib/auth'
+import { clearAuth, getStoredUser, saveStoredUser } from '@/lib/auth'
 import type { User } from '@/lib/api'
 import { UserContext } from './user-context'
 
@@ -68,6 +68,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['FARMER', 'RETAILER', 'INVESTOR'],
   },
   {
+    href: '/dashboard/settings',
+    label: 'Settings',
+    icon: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.4-3a7.4 7.4 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L14.8 3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.4 7.4 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6c.1-.3.1-.7.1-1z',
+    roles: ['FARMER', 'RETAILER', 'INVESTOR', 'SUPPLIER', 'ADMIN'],
+  },
+  {
     href: '#portfolio',
     label: 'Portfolio',
     icon: 'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zm0 3h18M16 14h2',
@@ -129,7 +135,17 @@ export default function DashboardLayout({
     router.push('/')
   }
 
-  if (!user) {
+  const updateUser = useCallback((updated: User) => {
+    saveStoredUser(updated)
+    setUser(updated)
+  }, [])
+
+  const contextValue = useMemo(
+    () => (user ? { user, updateUser } : null),
+    [user, updateUser]
+  )
+
+  if (!user || !contextValue) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-8 h-8 border-[3px] border-brand-600 border-t-transparent rounded-full animate-spin" />
@@ -140,7 +156,7 @@ export default function DashboardLayout({
   const navItems = NAV_ITEMS.filter((item) => item.roles.includes(user.role))
 
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={contextValue}>
       <div className="min-h-screen bg-gray-50">
         {/* Mobile overlay */}
         {sidebarOpen && (

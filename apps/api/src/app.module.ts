@@ -9,6 +9,7 @@ import { DemandsModule } from './demands/demands.module'
 import { CampaignsModule } from './campaigns/campaigns.module'
 import { CropDoctorModule } from './crop-doctor/crop-doctor.module'
 import { TransactionsModule } from './transactions/transactions.module'
+import { StatsModule } from './stats/stats.module'
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TransactionsModule } from './transactions/transactions.module'
     CampaignsModule,
     CropDoctorModule,
     TransactionsModule,
+    StatsModule,
   ],
   controllers: [AppController],
   providers: [],

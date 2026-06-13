@@ -1,8 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { InitializeOrderResult, Listing, PaginatedListings } from '@/lib/api'
+import { cropEmoji, timeAgo } from '@/lib/format'
 import { useUser } from '../user-context'
 
 const POPULAR_CROPS = ['Tomatoes', 'Maize', 'Cassava', 'Onions', 'Plantain', 'Rice', 'Yam', 'Pepper']
@@ -277,12 +279,19 @@ function ListingCard({
   return (
     <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden hover:shadow-lg hover:border-brand-200 transition-all">
       {/* Placeholder visual until photo uploads ship */}
-      <div className="h-28 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
-        <span className="text-4xl">{cropEmoji(listing.crop)}</span>
-      </div>
+      <Link href={`/dashboard/marketplace/${listing.id}`} className="block">
+        <div className="h-28 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
+          <span className="text-4xl">{cropEmoji(listing.crop)}</span>
+        </div>
+      </Link>
       <div className="p-5">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-gray-900">{listing.crop}</h3>
+          <Link
+            href={`/dashboard/marketplace/${listing.id}`}
+            className="font-bold text-gray-900 hover:text-brand-700 transition-colors"
+          >
+            {listing.crop}
+          </Link>
           <span className="shrink-0 text-xs text-gray-400">{posted}</span>
         </div>
         <p className="mt-0.5 text-sm text-gray-500 flex items-center gap-1">
@@ -315,26 +324,4 @@ function ListingCard({
       </div>
     </div>
   )
-}
-
-function timeAgo(iso: string): string {
-  const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
-  if (seconds < 3600) return `${Math.max(1, Math.floor(seconds / 60))}m ago`
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
-  return `${Math.floor(seconds / 86400)}d ago`
-}
-
-function cropEmoji(crop: string): string {
-  const c = crop.toLowerCase()
-  if (c.includes('tomato')) return '🍅'
-  if (c.includes('maize') || c.includes('corn')) return '🌽'
-  if (c.includes('onion')) return '🧅'
-  if (c.includes('pepper') || c.includes('chil')) return '🌶️'
-  if (c.includes('plantain') || c.includes('banana')) return '🍌'
-  if (c.includes('rice')) return '🍚'
-  if (c.includes('yam') || c.includes('potato') || c.includes('cassava')) return '🍠'
-  if (c.includes('mango')) return '🥭'
-  if (c.includes('pineapple')) return '🍍'
-  if (c.includes('cocoa')) return '🍫'
-  return '🌾'
 }

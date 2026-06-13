@@ -5,6 +5,8 @@ export interface User {
   email: string
   role: 'FARMER' | 'RETAILER' | 'INVESTOR' | 'SUPPLIER' | 'ADMIN'
   fullName: string | null
+  phone?: string | null
+  location?: string | null
   kycStatus: string
   trustScore: number
   avatarUrl: string | null
@@ -58,6 +60,11 @@ export interface PaginatedListings {
   total: number
   page: number
   pages: number
+}
+
+/** GET /listings/:id includes the farmer on the farm. */
+export interface ListingDetail extends Listing {
+  farm: FarmSummary & { farmer: PersonSummary }
 }
 
 export type DemandStatus = 'OPEN' | 'BIDDING' | 'AWARDED' | 'IN_DELIVERY' | 'COMPLETED'
@@ -178,6 +185,7 @@ export interface Transaction {
   buyerId: string
   sellerId: string
   listingId: string | null
+  bidId: string | null
   crop: string | null
   quantityKg: number | null
   amount: number
@@ -192,6 +200,37 @@ export interface InitializeOrderResult {
   authorizationUrl: string
   reference: string
 }
+
+export interface FarmerStats {
+  role: 'FARMER'
+  farms: number
+  activeListings: number
+  pendingBids: number
+  salesInEscrow: number
+  totalEarned: number
+}
+
+export interface RetailerStats {
+  role: 'RETAILER'
+  openDemands: number
+  bidsReceived: number
+  ordersInEscrow: number
+  totalSpent: number
+}
+
+export interface InvestorStats {
+  role: 'INVESTOR'
+  activeInvestments: number
+  portfolioValue: number
+  campaignsFunded: number
+  totalPaidOut: number
+}
+
+export interface BasicStats {
+  role: 'SUPPLIER' | 'ADMIN'
+}
+
+export type OverviewStats = FarmerStats | RetailerStats | InvestorStats | BasicStats
 
 export class ApiError extends Error {
   constructor(

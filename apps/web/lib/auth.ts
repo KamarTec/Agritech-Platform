@@ -8,6 +8,10 @@ export function saveAuth(result: AuthResult): void {
   localStorage.setItem(USER_KEY, JSON.stringify(result.user))
 }
 
+export function saveStoredUser(user: User): void {
+  localStorage.setItem(USER_KEY, JSON.stringify(user))
+}
+
 export function getStoredUser(): User | null {
   if (typeof window === 'undefined') return null
   const raw = localStorage.getItem(USER_KEY)

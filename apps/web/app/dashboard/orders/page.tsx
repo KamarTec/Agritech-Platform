@@ -146,6 +146,9 @@ function OrdersContent() {
                       <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-xs font-semibold">
                         {isBuyer ? 'BUYING' : 'SELLING'}
                       </span>
+                      <span className="px-2 py-0.5 rounded-full bg-gray-50 text-gray-400 text-xs font-semibold">
+                        {tx.type === 'DEMAND' ? 'Demand order' : 'Marketplace'}
+                      </span>
                     </div>
                     <p className="mt-1 text-sm text-gray-500">
                       <span className="font-bold text-gray-900">GH₵ {tx.amount.toLocaleString()}</span>

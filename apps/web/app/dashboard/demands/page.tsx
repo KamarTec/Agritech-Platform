@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
-import type { Bid, DemandRequest, DemandStatus, PaginatedDemands } from '@/lib/api'
+import type { Bid, DemandRequest, DemandStatus, InitializeOrderResult, PaginatedDemands } from '@/lib/api'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -135,6 +135,30 @@ function RetailerView() {
     }
   }
 
+  async function payNow(demand: DemandRequest): Promise<void> {
+    try {
+      const demandBids = bids[demand.id] ?? (await api.get<Bid[]>(`/demands/${demand.id}/bids`))
+      const accepted = demandBids.find((b) => b.status === 'ACCEPTED')
+      if (!accepted) {
+        setError('No accepted bid found for this request.')
+        return
+      }
+      const total = accepted.offeredPrice * demand.quantityKg
+      if (
+        !window.confirm(
+          `Pay GH₵ ${total.toLocaleString(undefined, { maximumFractionDigits: 2 })} into escrow for ${demand.quantityKg.toLocaleString()} kg ${demand.crop}? The farmer is paid once you confirm delivery.`
+        )
+      )
+        return
+      const result = await api.post<InitializeOrderResult>('/transactions/initialize-bid', {
+        bidId: accepted.id,
+      })
+      window.location.href = result.authorizationUrl // off to Paystack checkout
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not start the payment. Try again.')
+    }
+  }
+
   return (
     <div className="max-w-5xl">
       <div className="flex items-center justify-between gap-4">
@@ -193,12 +217,20 @@ function RetailerView() {
                   </div>
                   <div className="flex items-center gap-2">
                     {demand.status === 'AWARDED' && (
-                      <button
-                        onClick={() => markCompleted(demand)}
-                        className="px-3 py-1.5 text-sm font-semibold text-brand-700 border border-gray-200 rounded-lg hover:border-brand-300 hover:bg-brand-50 transition-colors"
-                      >
-                        Mark completed
-                      </button>
+                      <>
+                        <button
+                          onClick={() => payNow(demand)}
+                          className="px-3 py-1.5 text-sm font-semibold text-white bg-brand-600 rounded-lg hover:bg-brand-700 transition-colors"
+                        >
+                          Pay now (escrow)
+                        </button>
+                        <button
+                          onClick={() => markCompleted(demand)}
+                          className="px-3 py-1.5 text-sm font-semibold text-brand-700 border border-gray-200 rounded-lg hover:border-brand-300 hover:bg-brand-50 transition-colors"
+                        >
+                          Mark completed
+                        </button>
+                      </>
                     )}
                     <button
                       onClick={() => toggleBids(demand)}
