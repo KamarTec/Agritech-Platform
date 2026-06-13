@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import { Transaction } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { PaystackService } from './paystack.service'
+import { TrustService } from '../trust/trust.service'
 
 // Fee model from the business plan: 2.5% marketplace + 0.5% escrow handling.
 const MARKETPLACE_FEE_PCT = 2.5
@@ -24,7 +25,8 @@ export class TransactionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly paystack: PaystackService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
+    private readonly trust: TrustService
   ) {}
 
   /** Buyer starts an escrow-protected order for a marketplace listing. */
@@ -274,6 +276,10 @@ export class TransactionsService {
         })
       }
     }
+
+    // A completed order lifts the trust score of both parties.
+    await this.trust.recomputeQuietly(transaction.buyerId)
+    await this.trust.recomputeQuietly(transaction.sellerId)
 
     return updated
   }

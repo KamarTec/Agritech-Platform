@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, Farm, PaginatedCampaigns, PaginatedListings, PersonSummary } from '@/lib/api'
 import { cropEmoji, daysUntil, formatGhs } from '@/lib/format'
+import { TrustBadge } from '@/components/trust-badge'
 
 type FarmProfile = Farm & { farmer?: PersonSummary }
 
@@ -74,7 +75,9 @@ export default function FarmProfilePage() {
           {farm.farmer && (
             <div className="rounded-xl bg-gray-50 px-4 py-3 text-right">
               <div className="text-sm font-semibold text-gray-900">{farm.farmer.fullName ?? 'Farmer'}</div>
-              <div className="text-xs text-gray-400">Trust {farm.farmer.trustScore}/100</div>
+              <div className="mt-1 flex justify-end">
+                <TrustBadge score={farm.farmer.trustScore} />
+              </div>
               {farm.farmer.kycStatus === 'VERIFIED' && (
                 <span className="mt-1 inline-flex text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
                   KYC verified

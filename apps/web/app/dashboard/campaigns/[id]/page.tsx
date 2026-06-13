@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, Investment } from '@/lib/api'
 import { daysUntil, formatDate, formatGhs } from '@/lib/format'
+import { TrustBadge } from '@/components/trust-badge'
 import { useUser } from '../../user-context'
 
 const inputClasses =
@@ -161,13 +162,11 @@ export default function CampaignDetailPage() {
                 </Link>
                 <p className="mt-0.5 text-sm text-gray-500">{campaign.farm.location}</p>
                 {campaign.farm.farmer && (
-                  <p className="mt-2 text-sm text-gray-600">
-                    {campaign.farm.farmer.fullName ?? 'Farmer'}
-                    <span className="ml-2 text-xs text-gray-400">
-                      Trust {campaign.farm.farmer.trustScore}/100
-                    </span>
+                  <p className="mt-2 text-sm text-gray-600 flex flex-wrap items-center gap-2">
+                    <span>{campaign.farm.farmer.fullName ?? 'Farmer'}</span>
+                    <TrustBadge score={campaign.farm.farmer.trustScore} />
                     {campaign.farm.farmer.kycStatus === 'VERIFIED' && (
-                      <span className="ml-2 text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
                         KYC verified
                       </span>
                     )}

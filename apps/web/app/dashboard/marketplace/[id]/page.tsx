@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { InitializeOrderResult, ListingDetail } from '@/lib/api'
 import { cropEmoji, formatDate, formatGhs, timeAgo } from '@/lib/format'
+import { TrustBadge } from '@/components/trust-badge'
 import { useUser } from '../../user-context'
 
 const inputClasses =
@@ -141,13 +142,11 @@ export default function ListingDetailPage() {
                   {listing.farm.verified && <span className="text-brand-600"> ✓</span>}
                 </Link>
                 <p className="mt-0.5 text-sm text-gray-500">{listing.farm.location}</p>
-                <p className="mt-2 text-sm text-gray-600">
-                  {listing.farm.farmer.fullName ?? 'Farmer'}
-                  <span className="ml-2 text-xs text-gray-400">
-                    Trust {listing.farm.farmer.trustScore}/100
-                  </span>
+                <p className="mt-2 text-sm text-gray-600 flex flex-wrap items-center gap-2">
+                  <span>{listing.farm.farmer.fullName ?? 'Farmer'}</span>
+                  <TrustBadge score={listing.farm.farmer.trustScore} />
                   {listing.farm.farmer.kycStatus === 'VERIFIED' && (
-                    <span className="ml-2 text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
                       KYC verified
                     </span>
                   )}

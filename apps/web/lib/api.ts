@@ -232,6 +232,17 @@ export interface BasicStats {
 
 export type OverviewStats = FarmerStats | RetailerStats | InvestorStats | BasicStats
 
+export interface TrustBreakdown {
+  score: number
+  tier: 'NEW' | 'BRONZE' | 'SILVER' | 'GOLD'
+  kycPoints: number
+  agePoints: number
+  orderPoints: number
+  completedOrders: number
+  accountAgeDays: number
+  kycStatus: string
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,

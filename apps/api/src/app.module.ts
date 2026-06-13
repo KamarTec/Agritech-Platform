@@ -10,6 +10,7 @@ import { CampaignsModule } from './campaigns/campaigns.module'
 import { CropDoctorModule } from './crop-doctor/crop-doctor.module'
 import { TransactionsModule } from './transactions/transactions.module'
 import { StatsModule } from './stats/stats.module'
+import { TrustModule } from './trust/trust.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { StatsModule } from './stats/stats.module'
     CropDoctorModule,
     TransactionsModule,
     StatsModule,
+    TrustModule,
   ],
   controllers: [AppController],
   providers: [],

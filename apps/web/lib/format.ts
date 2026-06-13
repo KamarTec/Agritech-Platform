@@ -17,6 +17,15 @@ export function formatGhs(amount: number): string {
   return `GH₵ ${amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
 }
 
+export type TrustTier = 'NEW' | 'BRONZE' | 'SILVER' | 'GOLD'
+
+export function trustTier(score: number): { tier: TrustTier; label: string; classes: string } {
+  if (score >= 75) return { tier: 'GOLD', label: 'Gold', classes: 'bg-amber-100 text-amber-700' }
+  if (score >= 50) return { tier: 'SILVER', label: 'Silver', classes: 'bg-slate-200 text-slate-700' }
+  if (score >= 25) return { tier: 'BRONZE', label: 'Bronze', classes: 'bg-orange-100 text-orange-700' }
+  return { tier: 'NEW', label: 'New', classes: 'bg-gray-100 text-gray-500' }
+}
+
 export function cropEmoji(crop: string): string {
   const c = crop.toLowerCase()
   if (c.includes('tomato')) return '🍅'

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
-import type { User } from '@/lib/api'
+import type { TrustBreakdown, User } from '@/lib/api'
+import { TrustBadge } from '@/components/trust-badge'
 import { useUser, useUpdateUser } from '../user-context'
 
 const inputClasses =
@@ -20,6 +21,9 @@ export default function SettingsPage() {
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileNotice, setProfileNotice] = useState<string | null>(null)
   const [profileError, setProfileError] = useState<string | null>(null)
+
+  // Trust score
+  const [trust, setTrust] = useState<TrustBreakdown | null>(null)
 
   // Password form
   const [currentPassword, setCurrentPassword] = useState('')
@@ -53,6 +57,22 @@ export default function SettingsPage() {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Recompute and show the trust score breakdown.
+  useEffect(() => {
+    let cancelled = false
+    api
+      .get<TrustBreakdown>('/trust/me')
+      .then((result) => {
+        if (!cancelled) setTrust(result)
+      })
+      .catch(() => {
+        /* trust score is non-critical */
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   async function handleProfileSave(e: React.FormEvent<HTMLFormElement>): Promise<void> {
@@ -183,6 +203,59 @@ export default function SettingsPage() {
               </button>
             </div>
           </form>
+        )}
+      </div>
+
+      {/* Trust score card */}
+      <div className="mt-6 rounded-2xl bg-white border border-gray-200 p-6">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-lg font-bold text-gray-900">Trust score</h2>
+          {trust && <TrustBadge score={trust.score} />}
+        </div>
+        <p className="mt-0.5 text-sm text-gray-500">
+          Earned automatically from your activity. Buyers and investors see this on your profile.
+        </p>
+
+        {trust ? (
+          <>
+            <div className="mt-4">
+              <div className="flex justify-between text-sm mb-1.5">
+                <span className="text-gray-500">Score</span>
+                <span className="font-semibold text-gray-900">{trust.score}/100</span>
+              </div>
+              <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-600 transition-all duration-500"
+                  style={{ width: `${trust.score}%` }}
+                />
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+              <div className="rounded-xl bg-gray-50 py-3">
+                <div className="font-bold text-gray-900">+{trust.kycPoints}</div>
+                <div className="text-[11px] text-gray-400">
+                  KYC ({trust.kycStatus.toLowerCase()})
+                </div>
+              </div>
+              <div className="rounded-xl bg-gray-50 py-3">
+                <div className="font-bold text-gray-900">+{trust.agePoints}</div>
+                <div className="text-[11px] text-gray-400">{trust.accountAgeDays}d on FarmLink</div>
+              </div>
+              <div className="rounded-xl bg-gray-50 py-3">
+                <div className="font-bold text-gray-900">+{trust.orderPoints}</div>
+                <div className="text-[11px] text-gray-400">
+                  {trust.completedOrders} completed order{trust.completedOrders === 1 ? '' : 's'}
+                </div>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-gray-400">
+              Tip: verify your identity and complete orders to climb from Bronze to Gold.
+            </p>
+          </>
+        ) : (
+          <div className="mt-6 flex justify-center">
+            <div className="w-6 h-6 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
+          </div>
         )}
       </div>
 
