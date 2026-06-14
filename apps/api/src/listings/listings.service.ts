@@ -1,9 +1,12 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { Listing, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
+import { BoostsService } from '../boosts/boosts.service'
 import { CreateListingDto } from './dto/create-listing.dto'
 import { UpdateListingDto } from './dto/update-listing.dto'
 import { QueryListingsDto } from './dto/query-listings.dto'
+
+export type MarketplaceListing = Listing & { boosted: boolean }
 
 const farmSummary = {
   select: { id: true, name: true, location: true, verified: true, farmerId: true },
@@ -29,9 +32,19 @@ export interface PaginatedListings {
   pages: number
 }
 
+export interface PaginatedMarketplace {
+  items: MarketplaceListing[]
+  total: number
+  page: number
+  pages: number
+}
+
 @Injectable()
 export class ListingsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly boosts: BoostsService
+  ) {}
 
   async create(farmerId: string, dto: CreateListingDto): Promise<Listing> {
     const farm = await this.prisma.farm.findUnique({
@@ -57,7 +70,7 @@ export class ListingsService {
     })
   }
 
-  async findMarketplace(query: QueryListingsDto): Promise<PaginatedListings> {
+  async findMarketplace(query: QueryListingsDto): Promise<PaginatedMarketplace> {
     const page = query.page ?? 1
     const limit = query.limit ?? 12
 
@@ -89,7 +102,15 @@ export class ListingsService {
       this.prisma.listing.count({ where }),
     ])
 
-    return { items, total, page, pages: Math.max(1, Math.ceil(total / limit)) }
+    // Mark + float boosted listings to the top of the page.
+    const boostedIds = await this.boosts.activeTargetIds(
+      'listing',
+      items.map((i) => i.id)
+    )
+    const marked: MarketplaceListing[] = items.map((i) => ({ ...i, boosted: boostedIds.has(i.id) }))
+    marked.sort((a, b) => Number(b.boosted) - Number(a.boosted))
+
+    return { items: marked, total, page, pages: Math.max(1, Math.ceil(total / limit)) }
   }
 
   findMine(farmerId: string): Promise<Listing[]> {

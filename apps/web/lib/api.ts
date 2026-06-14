@@ -53,6 +53,7 @@ export interface Listing {
   status: ListingStatus
   createdAt: string
   farm: FarmSummary
+  boosted?: boolean
 }
 
 export interface PaginatedListings {
@@ -241,6 +242,30 @@ export interface Notification {
   read: boolean
   actionUrl: string | null
   createdAt: string
+}
+
+export interface SubscriptionPlan {
+  id: string
+  name: string
+  priceGhs: number
+  features: string[]
+  paystackPlanCode: string | null
+}
+
+export interface MySubscription {
+  plan: SubscriptionPlan | null
+  status: string
+  currentPeriodEnd: string | null
+}
+
+export interface SubscribeResult {
+  authorizationUrl: string
+  reference: string
+}
+
+export interface BoostResult {
+  authorizationUrl: string
+  reference: string
 }
 
 export interface Message {

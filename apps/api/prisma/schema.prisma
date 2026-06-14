@@ -266,11 +266,13 @@ model BoostRecord {
   priceGhs    Float
   startsAt    DateTime
   expiresAt   DateTime
-  active      Boolean     @default(true)
+  active      Boolean     @default(false)
+  paystackReference String? @unique
   createdAt   DateTime    @default(now())
 
   @@index([userId])
   @@index([expiresAt])
+  @@index([targetType, targetId])
 }
 
 model PlatformFee {

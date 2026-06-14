@@ -291,6 +291,11 @@ function ListingCard({
             className="font-bold text-gray-900 hover:text-brand-700 transition-colors"
           >
             {listing.crop}
+            {listing.boosted && (
+              <span className="ml-2 align-middle text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
+                Boosted
+              </span>
+            )}
           </Link>
           <span className="shrink-0 text-xs text-gray-400">{posted}</span>
         </div>

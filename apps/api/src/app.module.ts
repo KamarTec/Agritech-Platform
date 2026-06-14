@@ -14,6 +14,8 @@ import { TrustModule } from './trust/trust.module'
 import { NotificationsModule } from './notifications/notifications.module'
 import { AdminModule } from './admin/admin.module'
 import { MessagesModule } from './messages/messages.module'
+import { SubscriptionsModule } from './subscriptions/subscriptions.module'
+import { BoostsModule } from './boosts/boosts.module'
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { MessagesModule } from './messages/messages.module'
     NotificationsModule,
     AdminModule,
     MessagesModule,
+    SubscriptionsModule,
+    BoostsModule,
   ],
   controllers: [AppController],
   providers: [],

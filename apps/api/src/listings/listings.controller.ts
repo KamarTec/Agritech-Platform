@@ -16,7 +16,7 @@ import { CurrentUser } from '../auth/current-user.decorator'
 import { JwtPayload } from '../auth/auth.service'
 import { Roles } from '../common/roles.decorator'
 import { RolesGuard } from '../common/roles.guard'
-import { ListingsService, PaginatedListings } from './listings.service'
+import { ListingsService, PaginatedMarketplace } from './listings.service'
 import { CreateListingDto } from './dto/create-listing.dto'
 import { UpdateListingDto } from './dto/update-listing.dto'
 import { QueryListingsDto } from './dto/query-listings.dto'
@@ -33,7 +33,7 @@ export class ListingsController {
   }
 
   @Get()
-  findMarketplace(@Query() query: QueryListingsDto): Promise<PaginatedListings> {
+  findMarketplace(@Query() query: QueryListingsDto): Promise<PaginatedMarketplace> {
     return this.listingsService.findMarketplace(query)
   }
 

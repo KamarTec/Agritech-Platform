@@ -4,8 +4,14 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
-import type { Farm, Listing, ListingStatus } from '@/lib/api'
+import type { BoostResult, Farm, Listing, ListingStatus } from '@/lib/api'
 import { useUser } from '../user-context'
+
+const BOOST_OPTIONS = [
+  { days: 7, price: 20 },
+  { days: 14, price: 35 },
+  { days: 30, price: 50 },
+]
 
 const inputClasses =
   'w-full px-4 py-3 rounded-xl border border-gray-300 text-[15px] text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-shadow'
@@ -37,6 +43,10 @@ export default function ListingsPage() {
   const [form, setForm] = useState<ListingForm>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [boostTarget, setBoostTarget] = useState<Listing | null>(null)
+  const [boostDays, setBoostDays] = useState(7)
+  const [boosting, setBoosting] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
     if (user.role !== 'FARMER') {
@@ -46,6 +56,23 @@ export default function ListingsPage() {
 
   useEffect(() => {
     load()
+  }, [])
+
+  // Verify a boost payment on return from Paystack (?reference=…).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const reference = params.get('reference') ?? params.get('trxref')
+    if (!reference) return
+    api
+      .post(`/boosts/verify/${reference}`, {})
+      .then(() => {
+        setNotice('Boost activated — your listing is now featured at the top of the marketplace. 🚀')
+        window.history.replaceState({}, '', '/dashboard/listings')
+        return load()
+      })
+      .catch(() => {
+        /* non-fatal */
+      })
   }, [])
 
   async function load(): Promise<void> {
@@ -109,6 +136,24 @@ export default function ListingsPage() {
     }
   }
 
+  async function confirmBoost(): Promise<void> {
+    if (!boostTarget) return
+    setBoosting(true)
+    setError(null)
+    try {
+      const result = await api.post<BoostResult>('/boosts', {
+        targetType: 'listing',
+        targetId: boostTarget.id,
+        days: boostDays,
+      })
+      window.location.href = result.authorizationUrl
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not start the boost payment.')
+      setBoosting(false)
+      setBoostTarget(null)
+    }
+  }
+
   return (
     <div className="max-w-6xl">
       <div className="flex items-center justify-between gap-4">
@@ -124,6 +169,13 @@ export default function ListingsPage() {
           + Post listing
         </button>
       </div>
+
+      {notice && (
+        <div className="mt-6 px-4 py-3 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-800 flex items-center justify-between gap-3">
+          {notice}
+          <button onClick={() => setNotice(null)} className="text-brand-400 hover:text-brand-700 font-bold">✕</button>
+        </div>
+      )}
 
       {error && (
         <div className="mt-6 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
@@ -196,12 +248,20 @@ export default function ListingsPage() {
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
                       {listing.status === 'ACTIVE' && (
-                        <button
-                          onClick={() => markStatus(listing, 'SOLD')}
-                          className="px-3 py-1.5 text-xs font-semibold text-blue-600 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
-                        >
-                          Mark sold
-                        </button>
+                        <>
+                          <button
+                            onClick={() => { setBoostTarget(listing); setBoostDays(7) }}
+                            className="px-3 py-1.5 text-xs font-semibold text-amber-700 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors"
+                          >
+                            🚀 Boost
+                          </button>
+                          <button
+                            onClick={() => markStatus(listing, 'SOLD')}
+                            className="px-3 py-1.5 text-xs font-semibold text-blue-600 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                          >
+                            Mark sold
+                          </button>
+                        </>
                       )}
                       {listing.status !== 'ACTIVE' && (
                         <button
@@ -336,6 +396,54 @@ export default function ListingsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Boost modal */}
+      {boostTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={() => !boosting && setBoostTarget(null)} />
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-gray-900">Boost {boostTarget.crop}</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Featured at the top of the marketplace with a “Boosted” badge for the chosen period.
+            </p>
+
+            <div className="mt-5 space-y-2">
+              {BOOST_OPTIONS.map((opt) => (
+                <button
+                  key={opt.days}
+                  type="button"
+                  onClick={() => setBoostDays(opt.days)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-colors ${
+                    boostDays === opt.days ? 'border-brand-500 bg-brand-50' : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="font-semibold text-gray-900">{opt.days} days</span>
+                  <span className="font-bold text-gray-900">GH₵ {opt.price}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                disabled={boosting}
+                onClick={() => setBoostTarget(null)}
+                className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold hover:border-gray-300 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={boosting}
+                onClick={confirmBoost}
+                className="flex-1 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-60 transition-colors"
+              >
+                {boosting ? 'Redirecting…' : 'Pay & boost'}
+              </button>
+            </div>
           </div>
         </div>
       )}
