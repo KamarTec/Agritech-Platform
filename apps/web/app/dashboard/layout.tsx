@@ -57,6 +57,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['RETAILER', 'FARMER'],
   },
   {
+    href: '/dashboard/prices',
+    label: 'Price Trends',
+    icon: 'M3 3v18h18M7 15l3-4 3 3 5-7',
+    roles: ['FARMER', 'RETAILER', 'INVESTOR', 'SUPPLIER', 'ADMIN'],
+  },
+  {
     href: '/dashboard/crop-doctor',
     label: 'Crop Doctor',
     icon: 'M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',

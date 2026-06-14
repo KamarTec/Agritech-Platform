@@ -16,6 +16,7 @@ import { AdminModule } from './admin/admin.module'
 import { MessagesModule } from './messages/messages.module'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 import { BoostsModule } from './boosts/boosts.module'
+import { PricesModule } from './prices/prices.module'
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { BoostsModule } from './boosts/boosts.module'
     MessagesModule,
     SubscriptionsModule,
     BoostsModule,
+    PricesModule,
   ],
   controllers: [AppController],
   providers: [],

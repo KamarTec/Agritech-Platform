@@ -244,6 +244,21 @@ export interface Notification {
   createdAt: string
 }
 
+export interface PricePoint {
+  recordedDate: string
+  pricePerKg: number
+  region: string
+}
+
+export interface PriceInsights {
+  crop: string
+  bestMonth: string | null
+  bestMonthAvg: number
+  latestAvg: number
+  cheapestMonth: string | null
+  dataPoints: number
+}
+
 export interface SubscriptionPlan {
   id: string
   name: string
