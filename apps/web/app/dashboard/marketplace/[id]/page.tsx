@@ -7,6 +7,7 @@ import { api, ApiError } from '@/lib/api'
 import type { InitializeOrderResult, ListingDetail } from '@/lib/api'
 import { cropEmoji, formatDate, formatGhs, timeAgo } from '@/lib/format'
 import { TrustBadge } from '@/components/trust-badge'
+import { MessageButton } from '@/components/message-button'
 import { useUser } from '../../user-context'
 
 const inputClasses =
@@ -152,12 +153,22 @@ export default function ListingDetailPage() {
                   )}
                 </p>
               </div>
-              <Link
-                href={`/dashboard/farms/${listing.farm.id}`}
-                className="shrink-0 px-3 py-1.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-700 transition-colors"
-              >
-                View farm →
-              </Link>
+              <div className="shrink-0 flex flex-col items-end gap-2">
+                <Link
+                  href={`/dashboard/farms/${listing.farm.id}`}
+                  className="px-3 py-1.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-700 transition-colors"
+                >
+                  View farm →
+                </Link>
+                {!isOwn && (
+                  <MessageButton
+                    participantId={listing.farm.farmer.id}
+                    contextType="listing"
+                    contextId={listing.id}
+                    label="Message farmer"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

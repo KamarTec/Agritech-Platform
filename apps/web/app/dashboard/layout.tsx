@@ -88,11 +88,10 @@ const NAV_ITEMS: NavItem[] = [
     soon: true,
   },
   {
-    href: '#messages',
+    href: '/dashboard/messages',
     label: 'Messages',
     icon: 'M21 12a8 8 0 0 1-8 8H4l2.5-2.5A8 8 0 1 1 21 12z',
     roles: ['FARMER', 'RETAILER', 'INVESTOR', 'SUPPLIER', 'ADMIN'],
-    soon: true,
   },
 ]
 

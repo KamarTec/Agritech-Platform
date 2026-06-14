@@ -13,6 +13,7 @@ import { StatsModule } from './stats/stats.module'
 import { TrustModule } from './trust/trust.module'
 import { NotificationsModule } from './notifications/notifications.module'
 import { AdminModule } from './admin/admin.module'
+import { MessagesModule } from './messages/messages.module'
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminModule } from './admin/admin.module'
     TrustModule,
     NotificationsModule,
     AdminModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [],

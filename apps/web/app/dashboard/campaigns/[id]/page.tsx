@@ -7,6 +7,7 @@ import { api, ApiError } from '@/lib/api'
 import type { Campaign, Investment } from '@/lib/api'
 import { daysUntil, formatDate, formatGhs } from '@/lib/format'
 import { TrustBadge } from '@/components/trust-badge'
+import { MessageButton } from '@/components/message-button'
 import { useUser } from '../../user-context'
 
 const inputClasses =
@@ -173,12 +174,22 @@ export default function CampaignDetailPage() {
                   </p>
                 )}
               </div>
-              <Link
-                href={`/dashboard/farms/${campaign.farm.id}`}
-                className="shrink-0 px-3 py-1.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-700 transition-colors"
-              >
-                View farm →
-              </Link>
+              <div className="shrink-0 flex flex-col items-end gap-2">
+                <Link
+                  href={`/dashboard/farms/${campaign.farm.id}`}
+                  className="px-3 py-1.5 text-sm font-semibold text-gray-600 border border-gray-200 rounded-lg hover:border-brand-400 hover:text-brand-700 transition-colors"
+                >
+                  View farm →
+                </Link>
+                {campaign.farm.farmer && campaign.farm.farmerId !== user.id && (
+                  <MessageButton
+                    participantId={campaign.farm.farmer.id}
+                    contextType="campaign"
+                    contextId={campaign.id}
+                    label="Message farmer"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

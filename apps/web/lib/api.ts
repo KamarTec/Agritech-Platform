@@ -243,6 +243,25 @@ export interface Notification {
   createdAt: string
 }
 
+export interface Message {
+  id: string
+  threadId: string
+  senderId: string
+  content: string
+  read: boolean
+  createdAt: string
+}
+
+export interface ThreadView {
+  id: string
+  contextType: string | null
+  contextId: string | null
+  updatedAt: string
+  otherUser: { id: string; fullName: string | null; role: string } | null
+  lastMessage: { content: string; senderId: string; createdAt: string } | null
+  unreadCount: number
+}
+
 export interface AdminMetrics {
   usersByRole: Record<string, number>
   totalUsers: number

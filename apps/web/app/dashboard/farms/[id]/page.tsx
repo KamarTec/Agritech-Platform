@@ -7,10 +7,13 @@ import { api, ApiError } from '@/lib/api'
 import type { Campaign, Farm, PaginatedCampaigns, PaginatedListings, PersonSummary } from '@/lib/api'
 import { cropEmoji, daysUntil, formatGhs } from '@/lib/format'
 import { TrustBadge } from '@/components/trust-badge'
+import { MessageButton } from '@/components/message-button'
+import { useUser } from '../../user-context'
 
 type FarmProfile = Farm & { farmer?: PersonSummary }
 
 export default function FarmProfilePage() {
+  const user = useUser()
   const { id } = useParams<{ id: string }>()
   const [farm, setFarm] = useState<FarmProfile | null>(null)
   const [listings, setListings] = useState<PaginatedListings | null>(null)
@@ -82,6 +85,11 @@ export default function FarmProfilePage() {
                 <span className="mt-1 inline-flex text-xs font-bold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
                   KYC verified
                 </span>
+              )}
+              {farm.farmer.id !== user.id && (
+                <div className="mt-2 flex justify-end">
+                  <MessageButton participantId={farm.farmer.id} contextType="farm" contextId={farm.id} label="Message" />
+                </div>
               )}
             </div>
           )}
