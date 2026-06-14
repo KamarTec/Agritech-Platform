@@ -21,6 +21,8 @@ model Profile {
   kycStatus       String      @default("PENDING") // PENDING | VERIFIED | REJECTED
   trustScore      Int         @default(0)
   avatarUrl       String?
+  passwordResetToken   String?  @unique
+  passwordResetExpires DateTime?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 

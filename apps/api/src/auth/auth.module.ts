@@ -5,10 +5,12 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { JwtAuthGuard } from './jwt-auth.guard'
 import { PrismaModule } from '../prisma/prisma.module'
+import { MailModule } from '../mail/mail.module'
 
 @Module({
   imports: [
     PrismaModule,
+    MailModule,
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
