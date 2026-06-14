@@ -1,4 +1,4 @@
-import { IsDateString, IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min, MinLength } from 'class-validator'
+import { IsArray, IsDateString, IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min, MinLength } from 'class-validator'
 
 export class CreateListingDto {
   @IsUUID()
@@ -20,4 +20,9 @@ export class CreateListingDto {
   @IsOptional()
   @IsDateString()
   harvestDate?: string
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  photos?: string[]
 }

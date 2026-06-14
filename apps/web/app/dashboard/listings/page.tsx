@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { BoostResult, Farm, Listing, ListingStatus } from '@/lib/api'
+import { ImageUpload } from '@/components/image-upload'
 import { useUser } from '../user-context'
 
 const BOOST_OPTIONS = [
@@ -43,6 +44,7 @@ export default function ListingsPage() {
   const [form, setForm] = useState<ListingForm>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const [boostTarget, setBoostTarget] = useState<Listing | null>(null)
   const [boostDays, setBoostDays] = useState(7)
   const [boosting, setBoosting] = useState(false)
@@ -92,6 +94,7 @@ export default function ListingsPage() {
 
   function openCreate(): void {
     setForm({ ...emptyForm, farmId: farms[0]?.id ?? '' })
+    setPhotoUrl(null)
     setFormError(null)
     setModalOpen(true)
   }
@@ -107,6 +110,7 @@ export default function ListingsPage() {
         quantityKg: Number(form.quantityKg),
         pricePerKg: Number(form.pricePerKg),
         ...(form.harvestDate ? { harvestDate: form.harvestDate } : {}),
+        ...(photoUrl ? { photos: [photoUrl] } : {}),
       })
       setModalOpen(false)
       await load()
@@ -377,6 +381,12 @@ export default function ListingsPage() {
                   onChange={(e) => setForm({ ...form, harvestDate: e.target.value })}
                   className={inputClasses}
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Photo <span className="font-normal text-gray-400">(optional)</span>
+                </label>
+                <ImageUpload purpose="listings" currentUrl={photoUrl} onUploaded={setPhotoUrl} label="Upload photo" />
               </div>
               <div className="flex gap-3 pt-1">
                 <button

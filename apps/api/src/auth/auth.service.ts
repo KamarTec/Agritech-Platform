@@ -96,6 +96,7 @@ export class AuthService {
         ...(dto.fullName !== undefined ? { fullName: dto.fullName.trim() } : {}),
         ...(dto.phone !== undefined ? { phone: dto.phone.trim() || null } : {}),
         ...(dto.location !== undefined ? { location: dto.location.trim() || null } : {}),
+        ...(dto.avatarUrl !== undefined ? { avatarUrl: dto.avatarUrl || null } : {}),
       },
     })
     return this.sanitize(user)

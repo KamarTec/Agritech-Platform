@@ -16,4 +16,9 @@ export class UpdateProfileDto {
   @IsString()
   @MaxLength(120, { message: 'Location must be at most 120 characters' })
   location?: string
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  avatarUrl?: string
 }

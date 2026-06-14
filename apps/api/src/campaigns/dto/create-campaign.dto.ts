@@ -1,6 +1,8 @@
 import {
+  IsArray,
   IsDateString,
   IsNumber,
+  IsOptional,
   IsString,
   IsUUID,
   Max,
@@ -34,4 +36,9 @@ export class CreateCampaignDto {
 
   @IsDateString({}, { message: 'Harvest date is required' })
   harvestDate!: string
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  photos?: string[]
 }

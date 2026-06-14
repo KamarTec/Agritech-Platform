@@ -24,6 +24,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1068.0",
     "@farmlink/shared-types": "file:../../packages/shared-types",
     "@farmlink/validation": "file:../../packages/validation",
     "@nestjs/bull": "^10.0.1",

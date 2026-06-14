@@ -90,10 +90,14 @@ export default function ListingDetailPage() {
         {/* Main column */}
         <div className="space-y-6">
           <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
-            {/* Placeholder visual until photo uploads ship */}
-            <div className="h-44 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
-              <span className="text-7xl">{cropEmoji(listing.crop)}</span>
-            </div>
+            {listing.photos?.[0] ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={listing.photos[0]} alt={listing.crop} className="h-56 w-full object-cover" />
+            ) : (
+              <div className="h-44 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
+                <span className="text-7xl">{cropEmoji(listing.crop)}</span>
+              </div>
+            )}
             <div className="p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>

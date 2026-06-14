@@ -86,7 +86,12 @@ export default function CampaignDetailPage() {
       <div className="mt-4 grid lg:grid-cols-[1fr,320px] gap-6 items-start">
         {/* Main column */}
         <div className="space-y-6">
-          <div className="rounded-2xl bg-white border border-gray-200 p-6">
+          <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+            {campaign.photos?.[0] && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={campaign.photos[0]} alt={campaign.crop} className="h-48 w-full object-cover" />
+            )}
+            <div className="p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900">{campaign.crop}</h1>
@@ -146,6 +151,7 @@ export default function CampaignDetailPage() {
                 {campaign.description}
               </p>
               <p className="mt-3 text-sm text-gray-400">Expected harvest {formatDate(campaign.harvestDate)}</p>
+            </div>
             </div>
           </div>
 

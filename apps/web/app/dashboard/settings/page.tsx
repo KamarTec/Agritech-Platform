@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { TrustBreakdown, User } from '@/lib/api'
 import { TrustBadge } from '@/components/trust-badge'
+import { ImageUpload } from '@/components/image-upload'
 import { useUser, useUpdateUser } from '../user-context'
 
 const inputClasses =
@@ -75,6 +76,16 @@ export default function SettingsPage() {
     }
   }, [])
 
+  async function handleAvatar(url: string): Promise<void> {
+    try {
+      const updated = await api.patch<User>('/auth/me', { avatarUrl: url })
+      updateUser(updated)
+      setProfileNotice('Photo updated.')
+    } catch (err) {
+      setProfileError(err instanceof ApiError ? err.message : 'Could not save the photo.')
+    }
+  }
+
   async function handleProfileSave(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
     setSavingProfile(true)
@@ -140,6 +151,11 @@ export default function SettingsPage() {
             {profileError}
           </div>
         )}
+
+        <div className="mt-5">
+          <label className="block text-sm font-semibold text-gray-700 mb-1.5">Profile photo</label>
+          <ImageUpload purpose="avatars" round currentUrl={user.avatarUrl} onUploaded={handleAvatar} label="Upload photo" />
+        </div>
 
         {!profileLoaded ? (
           <div className="mt-8 flex justify-center">

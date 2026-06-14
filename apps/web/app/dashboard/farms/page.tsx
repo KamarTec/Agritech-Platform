@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { Farm } from '@/lib/api'
+import { ImageUpload } from '@/components/image-upload'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -27,6 +28,7 @@ export default function FarmsPage() {
   const [form, setForm] = useState<FarmForm>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (user.role !== 'FARMER') {
@@ -51,6 +53,7 @@ export default function FarmsPage() {
   function openCreate(): void {
     setEditing(null)
     setForm(emptyForm)
+    setPhotoUrl(null)
     setFormError(null)
     setModalOpen(true)
   }
@@ -58,6 +61,7 @@ export default function FarmsPage() {
   function openEdit(farm: Farm): void {
     setEditing(farm)
     setForm({ name: farm.name, location: farm.location, description: farm.description ?? '' })
+    setPhotoUrl(farm.photos?.[0] ?? null)
     setFormError(null)
     setModalOpen(true)
   }
@@ -70,6 +74,7 @@ export default function FarmsPage() {
       name: form.name.trim(),
       location: form.location.trim(),
       ...(form.description.trim() ? { description: form.description.trim() } : {}),
+      ...(photoUrl ? { photos: [photoUrl] } : {}),
     }
     try {
       if (editing) {
@@ -256,6 +261,12 @@ export default function FarmsPage() {
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   className={inputClasses}
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Farm photo <span className="font-normal text-gray-400">(optional)</span>
+                </label>
+                <ImageUpload purpose="farms" currentUrl={photoUrl} onUploaded={setPhotoUrl} label="Upload photo" />
               </div>
               <div className="flex gap-3 pt-1">
                 <button

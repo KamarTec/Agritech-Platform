@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { CropDiagnosis, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { SubscriptionsService } from '../subscriptions/subscriptions.service'
+import { StorageService } from '../storage/storage.service'
 import { Diagnosis, GeminiService } from './gemini.service'
 
 const FREE_MONTHLY_LIMIT = 10
@@ -17,7 +18,8 @@ export class CropDoctorService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly gemini: GeminiService,
-    private readonly subscriptions: SubscriptionsService
+    private readonly subscriptions: SubscriptionsService,
+    private readonly storage: StorageService
   ) {}
 
   private async monthlyLimit(farmerId: string): Promise<number> {
@@ -41,10 +43,20 @@ export class CropDoctorService {
 
     const diagnosis = await this.gemini.diagnoseCrop(imageBuffer.toString('base64'), mimeType)
 
+    // Persist the image to R2 when configured; never block diagnosis on it.
+    let imageUrl = ''
+    if (this.storage.enabled()) {
+      try {
+        imageUrl = await this.storage.uploadImage(imageBuffer, mimeType, 'crop-doctor')
+      } catch {
+        imageUrl = ''
+      }
+    }
+
     await this.prisma.cropDiagnosis.create({
       data: {
         farmerId,
-        imageUrl: '', // photo storage lands with the R2 integration
+        imageUrl,
         result: diagnosis as unknown as Prisma.InputJsonValue,
       },
     })

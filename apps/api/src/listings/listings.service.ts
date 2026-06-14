@@ -65,6 +65,7 @@ export class ListingsService {
         quantityKg: dto.quantityKg,
         pricePerKg: dto.pricePerKg,
         harvestDate: dto.harvestDate ? new Date(dto.harvestDate) : null,
+        ...(dto.photos ? { photos: dto.photos } : {}),
       },
       include: { farm: farmSummary },
     })

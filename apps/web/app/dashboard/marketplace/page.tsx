@@ -280,9 +280,14 @@ function ListingCard({
     <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden hover:shadow-lg hover:border-brand-200 transition-all">
       {/* Placeholder visual until photo uploads ship */}
       <Link href={`/dashboard/marketplace/${listing.id}`} className="block">
-        <div className="h-28 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
-          <span className="text-4xl">{cropEmoji(listing.crop)}</span>
-        </div>
+        {listing.photos?.[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={listing.photos[0]} alt={listing.crop} className="h-28 w-full object-cover" />
+        ) : (
+          <div className="h-28 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
+            <span className="text-4xl">{cropEmoji(listing.crop)}</span>
+          </div>
+        )}
       </Link>
       <div className="p-5">
         <div className="flex items-start justify-between gap-2">

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, CampaignStatus, Farm, Investment, PaginatedCampaigns } from '@/lib/api'
+import { ImageUpload } from '@/components/image-upload'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -88,6 +89,7 @@ function FarmerView() {
   const [form, setForm] = useState<CampaignForm>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -120,6 +122,7 @@ function FarmerView() {
         targetAmount: Number(form.targetAmount),
         profitSharePct: Number(form.profitSharePct),
         harvestDate: form.harvestDate,
+        ...(photoUrl ? { photos: [photoUrl] } : {}),
       })
       setModalOpen(false)
       await load()
@@ -154,6 +157,7 @@ function FarmerView() {
         <button
           onClick={() => {
             setForm({ ...emptyForm, farmId: farms[0]?.id ?? '' })
+            setPhotoUrl(null)
             setFormError(null)
             setModalOpen(true)
           }}
@@ -337,6 +341,12 @@ function FarmerView() {
                   onChange={(e) => setForm({ ...form, harvestDate: e.target.value })}
                   className={inputClasses}
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Campaign photo <span className="font-normal text-gray-400">(optional)</span>
+                </label>
+                <ImageUpload purpose="campaigns" currentUrl={photoUrl} onUploaded={setPhotoUrl} label="Upload photo" />
               </div>
               <div className="flex gap-3 pt-1">
                 <button

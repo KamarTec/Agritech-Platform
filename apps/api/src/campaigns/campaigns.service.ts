@@ -62,6 +62,7 @@ export class CampaignsService {
         profitSharePct: dto.profitSharePct,
         harvestDate,
         status: 'ACTIVE',
+        ...(dto.photos ? { photos: dto.photos } : {}),
       },
       include: { farm: farmWithFarmer, _count: { select: { investments: true } } },
     })

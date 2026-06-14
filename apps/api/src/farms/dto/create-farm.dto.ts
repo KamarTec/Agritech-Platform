@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
+import { IsArray, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator'
 
 export class CreateFarmDto {
   @IsString()
@@ -23,4 +23,9 @@ export class CreateFarmDto {
   @IsOptional()
   @IsNumber()
   longitude?: number
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  photos?: string[]
 }

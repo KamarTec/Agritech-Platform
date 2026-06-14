@@ -66,7 +66,12 @@ export default function FarmProfilePage() {
   return (
     <div className="max-w-4xl">
       {/* Farm header */}
-      <div className="rounded-2xl bg-white border border-gray-200 p-6">
+      <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
+        {farm.photos?.[0] && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={farm.photos[0]} alt={farm.name} className="h-40 w-full object-cover" />
+        )}
+        <div className="p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-gray-900">
@@ -99,6 +104,7 @@ export default function FarmProfilePage() {
             {farm.description}
           </p>
         )}
+        </div>
       </div>
 
       {/* Active listings */}

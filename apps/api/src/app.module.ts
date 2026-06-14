@@ -17,6 +17,7 @@ import { MessagesModule } from './messages/messages.module'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 import { BoostsModule } from './boosts/boosts.module'
 import { PricesModule } from './prices/prices.module'
+import { StorageModule } from './storage/storage.module'
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { PricesModule } from './prices/prices.module'
     SubscriptionsModule,
     BoostsModule,
     PricesModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [],
