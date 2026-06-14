@@ -69,6 +69,12 @@ const NAV_ITEMS: NavItem[] = [
     roles: ['FARMER', 'RETAILER', 'INVESTOR'],
   },
   {
+    href: '/dashboard/admin',
+    label: 'Admin',
+    icon: 'M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4zM9.5 12l1.8 1.8 3.2-3.6',
+    roles: ['ADMIN'],
+  },
+  {
     href: '/dashboard/settings',
     label: 'Settings',
     icon: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.4-3a7.4 7.4 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7.4 7.4 0 0 0-1.7-1L14.8 3h-4l-.4 2.6a7.4 7.4 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7.4 7.4 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.4 7.4 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7.4 7.4 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6c.1-.3.1-.7.1-1z',

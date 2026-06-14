@@ -12,6 +12,7 @@ import { TransactionsModule } from './transactions/transactions.module'
 import { StatsModule } from './stats/stats.module'
 import { TrustModule } from './trust/trust.module'
 import { NotificationsModule } from './notifications/notifications.module'
+import { AdminModule } from './admin/admin.module'
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { NotificationsModule } from './notifications/notifications.module'
     StatsModule,
     TrustModule,
     NotificationsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [],

@@ -40,7 +40,7 @@ export interface FarmSummary {
   farmerId: string
 }
 
-export type ListingStatus = 'ACTIVE' | 'SOLD' | 'EXPIRED'
+export type ListingStatus = 'ACTIVE' | 'SOLD' | 'EXPIRED' | 'SUSPENDED'
 
 export interface Listing {
   id: string
@@ -241,6 +241,30 @@ export interface Notification {
   read: boolean
   actionUrl: string | null
   createdAt: string
+}
+
+export interface AdminMetrics {
+  usersByRole: Record<string, number>
+  totalUsers: number
+  listings: number
+  campaigns: number
+  gmv: number
+  escrowHeld: number
+  openDisputes: number
+  pendingKyc: number
+}
+
+export interface AdminPerson {
+  id: string
+  fullName: string | null
+  email: string
+  role: string
+}
+
+export interface DisputeView {
+  transaction: Transaction
+  buyer: AdminPerson | null
+  seller: AdminPerson | null
 }
 
 export interface TrustBreakdown {

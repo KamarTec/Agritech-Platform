@@ -14,6 +14,7 @@ const statusStyles: Record<ListingStatus, string> = {
   ACTIVE: 'bg-brand-50 text-brand-700',
   SOLD: 'bg-blue-50 text-blue-700',
   EXPIRED: 'bg-gray-100 text-gray-500',
+  SUSPENDED: 'bg-red-50 text-red-600',
 }
 
 interface ListingForm {
