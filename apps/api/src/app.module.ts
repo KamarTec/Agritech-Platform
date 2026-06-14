@@ -18,6 +18,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 import { BoostsModule } from './boosts/boosts.module'
 import { PricesModule } from './prices/prices.module'
 import { StorageModule } from './storage/storage.module'
+import { WeatherModule } from './weather/weather.module'
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { StorageModule } from './storage/storage.module'
     BoostsModule,
     PricesModule,
     StorageModule,
+    WeatherModule,
   ],
   controllers: [AppController],
   providers: [],

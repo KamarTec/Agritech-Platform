@@ -14,9 +14,11 @@ interface FarmForm {
   name: string
   location: string
   description: string
+  latitude: string
+  longitude: string
 }
 
-const emptyForm: FarmForm = { name: '', location: '', description: '' }
+const emptyForm: FarmForm = { name: '', location: '', description: '', latitude: '', longitude: '' }
 
 export default function FarmsPage() {
   const user = useUser()
@@ -60,7 +62,13 @@ export default function FarmsPage() {
 
   function openEdit(farm: Farm): void {
     setEditing(farm)
-    setForm({ name: farm.name, location: farm.location, description: farm.description ?? '' })
+    setForm({
+      name: farm.name,
+      location: farm.location,
+      description: farm.description ?? '',
+      latitude: farm.latitude != null ? String(farm.latitude) : '',
+      longitude: farm.longitude != null ? String(farm.longitude) : '',
+    })
     setPhotoUrl(farm.photos?.[0] ?? null)
     setFormError(null)
     setModalOpen(true)
@@ -74,6 +82,8 @@ export default function FarmsPage() {
       name: form.name.trim(),
       location: form.location.trim(),
       ...(form.description.trim() ? { description: form.description.trim() } : {}),
+      ...(form.latitude.trim() ? { latitude: Number(form.latitude) } : {}),
+      ...(form.longitude.trim() ? { longitude: Number(form.longitude) } : {}),
       ...(photoUrl ? { photos: [photoUrl] } : {}),
     }
     try {
@@ -267,6 +277,36 @@ export default function FarmsPage() {
                   Farm photo <span className="font-normal text-gray-400">(optional)</span>
                 </label>
                 <ImageUpload purpose="farms" currentUrl={photoUrl} onUploaded={setPhotoUrl} label="Upload photo" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="farm-lat" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Latitude <span className="font-normal text-gray-400">(for weather)</span>
+                  </label>
+                  <input
+                    id="farm-lat"
+                    type="number"
+                    step="any"
+                    placeholder="6.69"
+                    value={form.latitude}
+                    onChange={(e) => setForm({ ...form, latitude: e.target.value })}
+                    className={inputClasses}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="farm-lng" className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    Longitude <span className="font-normal text-gray-400">(optional)</span>
+                  </label>
+                  <input
+                    id="farm-lng"
+                    type="number"
+                    step="any"
+                    placeholder="-1.62"
+                    value={form.longitude}
+                    onChange={(e) => setForm({ ...form, longitude: e.target.value })}
+                    className={inputClasses}
+                  />
+                </div>
               </div>
               <div className="flex gap-3 pt-1">
                 <button

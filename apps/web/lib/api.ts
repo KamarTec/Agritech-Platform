@@ -244,6 +244,19 @@ export interface Notification {
   createdAt: string
 }
 
+export interface DailyForecast {
+  date: string
+  tempMin: number
+  tempMax: number
+  condition: string
+  icon: string
+}
+
+export interface WeatherResult {
+  location: string
+  days: DailyForecast[]
+}
+
 export interface PricePoint {
   recordedDate: string
   pricePerKg: number

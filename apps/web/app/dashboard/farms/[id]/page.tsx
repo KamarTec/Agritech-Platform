@@ -8,6 +8,7 @@ import type { Campaign, Farm, PaginatedCampaigns, PaginatedListings, PersonSumma
 import { cropEmoji, daysUntil, formatGhs } from '@/lib/format'
 import { TrustBadge } from '@/components/trust-badge'
 import { MessageButton } from '@/components/message-button'
+import { WeatherCard } from '@/components/weather-card'
 import { useUser } from '../../user-context'
 
 type FarmProfile = Farm & { farmer?: PersonSummary }
@@ -105,6 +106,11 @@ export default function FarmProfilePage() {
           </p>
         )}
         </div>
+      </div>
+
+      {/* Weather */}
+      <div className="mt-6">
+        <WeatherCard lat={farm.latitude} lng={farm.longitude} />
       </div>
 
       {/* Active listings */}
