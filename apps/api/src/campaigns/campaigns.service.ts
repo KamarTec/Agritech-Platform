@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service'
 import { CreateCampaignDto } from './dto/create-campaign.dto'
 import { InvestDto } from './dto/invest.dto'
 import { QueryCampaignsDto } from './dto/query-campaigns.dto'
+import { NotificationsService } from '../notifications/notifications.service'
 
 const farmWithFarmer = {
   select: {
@@ -30,7 +31,10 @@ export interface PaginatedCampaigns {
 
 @Injectable()
 export class CampaignsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService
+  ) {}
 
   async create(farmerId: string, dto: CreateCampaignDto): Promise<Campaign> {
     const farm = await this.prisma.farm.findUnique({
@@ -131,6 +135,7 @@ export class CampaignsService {
         targetAmount: true,
         raisedAmount: true,
         profitSharePct: true,
+        crop: true,
         farm: { select: { farmerId: true } },
       },
     })
@@ -175,6 +180,23 @@ export class CampaignsService {
         },
       }),
     ])
+
+    await this.notifications.notifyQuietly({
+      userId: campaign.farm.farmerId,
+      type: 'NEW_INVESTMENT',
+      title: 'New investment',
+      body: `An investor put GH₵ ${dto.amount.toLocaleString()} into your ${campaign.crop} campaign.`,
+      actionUrl: '/dashboard/campaigns',
+    })
+    if (funded) {
+      await this.notifications.notifyQuietly({
+        userId: campaign.farm.farmerId,
+        type: 'CAMPAIGN_FUNDED',
+        title: 'Campaign fully funded! 🎉',
+        body: `Your ${campaign.crop} campaign hit its GH₵ ${campaign.targetAmount.toLocaleString()} target.`,
+        actionUrl: '/dashboard/campaigns',
+      })
+    }
 
     return investment
   }

@@ -9,6 +9,7 @@ import { Transaction } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { PaystackService } from './paystack.service'
 import { TrustService } from '../trust/trust.service'
+import { NotificationsService } from '../notifications/notifications.service'
 
 // Fee model from the business plan: 2.5% marketplace + 0.5% escrow handling.
 const MARKETPLACE_FEE_PCT = 2.5
@@ -26,7 +27,8 @@ export class TransactionsService {
     private readonly prisma: PrismaService,
     private readonly paystack: PaystackService,
     private readonly config: ConfigService,
-    private readonly trust: TrustService
+    private readonly trust: TrustService,
+    private readonly notifications: NotificationsService
   ) {}
 
   /** Buyer starts an escrow-protected order for a marketplace listing. */
@@ -239,6 +241,14 @@ export class TransactionsService {
       }
     }
 
+    await this.notifications.notifyQuietly({
+      userId: transaction.sellerId,
+      type: 'ORDER_PAID',
+      title: 'New paid order',
+      body: `A buyer paid GH₵ ${transaction.amount.toLocaleString()} into escrow${transaction.crop ? ` for ${transaction.crop}` : ''}. Funds release once they confirm delivery.`,
+      actionUrl: '/dashboard/orders',
+    })
+
     return updated
   }
 
@@ -280,6 +290,14 @@ export class TransactionsService {
     // A completed order lifts the trust score of both parties.
     await this.trust.recomputeQuietly(transaction.buyerId)
     await this.trust.recomputeQuietly(transaction.sellerId)
+
+    await this.notifications.notifyQuietly({
+      userId: transaction.sellerId,
+      type: 'PAYMENT_RELEASED',
+      title: 'Payment released',
+      body: `The buyer confirmed delivery — GH₵ ${transaction.amount.toLocaleString()} has been released to you.`,
+      actionUrl: '/dashboard/orders',
+    })
 
     return updated
   }

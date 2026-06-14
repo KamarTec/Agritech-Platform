@@ -232,6 +232,17 @@ export interface BasicStats {
 
 export type OverviewStats = FarmerStats | RetailerStats | InvestorStats | BasicStats
 
+export interface Notification {
+  id: string
+  userId: string
+  type: string
+  title: string
+  body: string
+  read: boolean
+  actionUrl: string | null
+  createdAt: string
+}
+
 export interface TrustBreakdown {
   score: number
   tier: 'NEW' | 'BRONZE' | 'SILVER' | 'GOLD'

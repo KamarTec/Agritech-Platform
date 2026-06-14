@@ -5,9 +5,10 @@ import { TransactionsService } from './transactions.service'
 import { PaystackService } from './paystack.service'
 import { PrismaModule } from '../prisma/prisma.module'
 import { TrustModule } from '../trust/trust.module'
+import { NotificationsModule } from '../notifications/notifications.module'
 
 @Module({
-  imports: [PrismaModule, TrustModule],
+  imports: [PrismaModule, TrustModule, NotificationsModule],
   controllers: [TransactionsController, PaystackWebhookController],
   providers: [TransactionsService, PaystackService],
   exports: [TransactionsService],

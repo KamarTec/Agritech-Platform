@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service'
 import { CreateDemandDto } from './dto/create-demand.dto'
 import { CreateBidDto } from './dto/create-bid.dto'
 import { QueryDemandsDto } from './dto/query-demands.dto'
+import { NotificationsService } from '../notifications/notifications.service'
 
 const retailerSummary = {
   select: { id: true, fullName: true, location: true, trustScore: true },
@@ -27,7 +28,10 @@ export interface PaginatedDemands {
 
 @Injectable()
 export class DemandsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService
+  ) {}
 
   create(retailerId: string, dto: CreateDemandDto): Promise<DemandRequest> {
     return this.prisma.demandRequest.create({
@@ -110,7 +114,7 @@ export class DemandsService {
   async placeBid(demandId: string, farmerId: string, dto: CreateBidDto): Promise<Bid> {
     const demand = await this.prisma.demandRequest.findUnique({
       where: { id: demandId },
-      select: { status: true, retailerId: true },
+      select: { status: true, retailerId: true, crop: true },
     })
     if (!demand) {
       throw new NotFoundException('Demand request not found')
@@ -143,6 +147,14 @@ export class DemandsService {
       }),
     ])
 
+    await this.notifications.notifyQuietly({
+      userId: demand.retailerId,
+      type: 'NEW_BID',
+      title: 'New bid received',
+      body: `A farmer bid GH₵ ${dto.offeredPrice.toFixed(2)}/kg on your ${demand.crop} request.`,
+      actionUrl: '/dashboard/demands',
+    })
+
     return bid
   }
 
@@ -160,7 +172,7 @@ export class DemandsService {
   async acceptBid(bidId: string, retailerId: string): Promise<Bid> {
     const bid = await this.prisma.bid.findUnique({
       where: { id: bidId },
-      include: { demand: { select: { id: true, retailerId: true, status: true } } },
+      include: { demand: { select: { id: true, retailerId: true, status: true, crop: true } } },
     })
     if (!bid) {
       throw new NotFoundException('Bid not found')
@@ -187,6 +199,14 @@ export class DemandsService {
         data: { status: 'AWARDED' },
       }),
     ])
+
+    await this.notifications.notifyQuietly({
+      userId: bid.farmerId,
+      type: 'BID_ACCEPTED',
+      title: 'Your bid was accepted',
+      body: `Your bid on the ${bid.demand.crop} request was accepted. The retailer will pay into escrow next.`,
+      actionUrl: '/dashboard/demands',
+    })
 
     return accepted
   }

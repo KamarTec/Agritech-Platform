@@ -11,6 +11,7 @@ import { CropDoctorModule } from './crop-doctor/crop-doctor.module'
 import { TransactionsModule } from './transactions/transactions.module'
 import { StatsModule } from './stats/stats.module'
 import { TrustModule } from './trust/trust.module'
+import { NotificationsModule } from './notifications/notifications.module'
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TrustModule } from './trust/trust.module'
     TransactionsModule,
     StatsModule,
     TrustModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [],

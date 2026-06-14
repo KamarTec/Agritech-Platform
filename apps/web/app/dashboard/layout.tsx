@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Logo } from '@/components/logo'
+import { NotificationBell } from '@/components/notification-bell'
 import { clearAuth, getStoredUser, saveStoredUser } from '@/lib/auth'
 import type { User } from '@/lib/api'
 import { UserContext } from './user-context'
@@ -247,6 +248,7 @@ export default function DashboardLayout({
               </svg>
             </button>
             <div className="ml-auto flex items-center gap-3">
+              <NotificationBell />
               <span className="hidden sm:inline-flex px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold uppercase tracking-wide">
                 {user.role}
               </span>
