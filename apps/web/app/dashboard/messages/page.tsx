@@ -187,7 +187,7 @@ function Conversation({
       <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messages === null && <Spinner />}
         {messages?.length === 0 && (
-          <div className="text-center text-sm text-gray-400 py-8">Say hello 👋</div>
+          <div className="text-center text-sm text-gray-400 py-8">No messages yet — say hello.</div>
         )}
         {messages?.map((m) => {
           const mine = m.senderId === userId

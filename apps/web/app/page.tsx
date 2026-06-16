@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
 import { Logo } from '@/components/logo'
+import { PublicListings, FinalCtaButtons } from '@/components/landing-client'
+import { LeafIcon } from '@/components/icons'
 
 /* ---------- Inline icons (24x24, stroke) ---------- */
 
@@ -50,6 +52,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <TrustBar />
+      <PublicListings />
       <Features />
       <HowItWorks />
       <Roles />
@@ -159,7 +162,10 @@ function CampaignCard() {
           </div>
           <div>
             <div className="font-semibold text-gray-900">Tomato Harvest — Kumasi</div>
-            <div className="text-sm text-gray-500">Kwame Farms · Verified ✓</div>
+            <div className="text-sm text-gray-500 inline-flex items-center gap-1">
+              Kwame Farms · Verified
+              <LeafIcon className="w-3.5 h-3.5 text-brand-600" />
+            </div>
           </div>
         </div>
         <span className="px-2.5 py-1 rounded-full bg-brand-100 text-brand-700 text-xs font-semibold">
@@ -626,20 +632,7 @@ function FinalCTA() {
               Join the platform connecting Ghana’s farms to retailers and
               capital. Free to start — takes under two minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/auth/register"
-                className="inline-flex justify-center px-8 py-4 rounded-xl bg-white text-forest font-semibold hover:bg-brand-50 shadow-xl transition-colors"
-              >
-                Create free account
-              </Link>
-              <Link
-                href="/auth/login"
-                className="inline-flex justify-center px-8 py-4 rounded-xl border border-white/25 text-white font-semibold hover:bg-white/10 transition-colors"
-              >
-                Sign in
-              </Link>
-            </div>
+            <FinalCtaButtons />
           </div>
         </div>
       </div>
@@ -697,7 +690,10 @@ function Footer() {
         </div>
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <p>© {new Date().getFullYear()} FarmLink. All rights reserved.</p>
-          <p>Made with 🌱 in Ghana</p>
+          <p className="inline-flex items-center gap-1.5">
+            Proudly built in Ghana
+            <LeafIcon className="w-4 h-4 text-brand-500" />
+          </p>
         </div>
       </div>
     </footer>

@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://farmlink-api-uffy.onrender.com'
 
 export interface User {
   id: string
@@ -46,6 +46,7 @@ export interface Listing {
   id: string
   farmId: string
   crop: string
+  category?: string | null
   quantityKg: number
   pricePerKg: number
   harvestDate: string | null
@@ -153,15 +154,24 @@ export interface PaginatedCampaigns {
   pages: number
 }
 
+export interface RecommendedProduct {
+  name: string
+  purpose: string
+  approxCostGhs?: number
+}
+
 export interface Diagnosis {
   healthy: boolean
   issue: string
   issueType: 'disease' | 'pest' | 'nutrient_deficiency' | 'healthy' | 'unknown'
   severity: 'none' | 'mild' | 'moderate' | 'severe'
+  urgency?: 'low' | 'medium' | 'high'
   confidencePct: number
   summary: string
+  immediateActions?: string[]
   treatment: string[]
   prevention: string[]
+  products?: RecommendedProduct[]
   estimatedCostGhs: number
 }
 

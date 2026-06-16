@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, Investment } from '@/lib/api'
 import { daysUntil, formatDate, formatGhs } from '@/lib/format'
+import { CheckCircleIcon } from '@/components/icons'
 import { TrustBadge } from '@/components/trust-badge'
 import { MessageButton } from '@/components/message-button'
 import { useUser } from '../../user-context'
@@ -95,9 +96,9 @@ export default function CampaignDetailPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight text-gray-900">{campaign.crop}</h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 inline-flex items-center gap-1">
                   {campaign.farm.name} · {campaign.farm.location}
-                  {campaign.farm.verified && <span className="text-brand-600 font-bold"> ✓</span>}
+                  {campaign.farm.verified && <CheckCircleIcon className="w-4 h-4 text-brand-600" />}
                 </p>
               </div>
               <span
@@ -164,8 +165,10 @@ export default function CampaignDetailPage() {
                   href={`/dashboard/farms/${campaign.farm.id}`}
                   className="font-bold text-gray-900 hover:text-brand-700 transition-colors"
                 >
-                  {campaign.farm.name}
-                  {campaign.farm.verified && <span className="text-brand-600"> ✓</span>}
+                  <span className="inline-flex items-center gap-1">
+                    {campaign.farm.name}
+                    {campaign.farm.verified && <CheckCircleIcon className="w-4 h-4 text-brand-600" />}
+                  </span>
                 </Link>
                 <p className="mt-0.5 text-sm text-gray-500">{campaign.farm.location}</p>
                 {campaign.farm.farmer && (

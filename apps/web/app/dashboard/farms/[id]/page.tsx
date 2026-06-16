@@ -5,7 +5,9 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, Farm, PaginatedCampaigns, PaginatedListings, PersonSummary } from '@/lib/api'
-import { cropEmoji, daysUntil, formatGhs } from '@/lib/format'
+import { daysUntil, formatGhs } from '@/lib/format'
+import { cropImage } from '@/lib/crops'
+import { CheckCircleIcon } from '@/components/icons'
 import { TrustBadge } from '@/components/trust-badge'
 import { MessageButton } from '@/components/message-button'
 import { WeatherCard } from '@/components/weather-card'
@@ -75,9 +77,9 @@ export default function FarmProfilePage() {
         <div className="p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+            <h1 className="inline-flex items-center gap-1.5 text-2xl font-bold tracking-tight text-gray-900">
               {farm.name}
-              {farm.verified && <span className="text-brand-600"> ✓</span>}
+              {farm.verified && <CheckCircleIcon className="w-5 h-5 text-brand-600" />}
             </h1>
             <p className="mt-1 text-gray-500">{farm.location}</p>
           </div>
@@ -123,9 +125,12 @@ export default function FarmProfilePage() {
               href={`/dashboard/marketplace/${listing.id}`}
               className="rounded-2xl bg-white border border-gray-200 overflow-hidden hover:shadow-lg hover:border-brand-200 transition-all"
             >
-              <div className="h-24 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
-                <span className="text-3xl">{cropEmoji(listing.crop)}</span>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={listing.photos?.[0] ?? cropImage(listing.crop)}
+                alt={listing.crop}
+                className="h-24 w-full object-cover"
+              />
               <div className="p-4">
                 <h3 className="font-bold text-gray-900">{listing.crop}</h3>
                 <div className="mt-1 text-sm text-gray-500">

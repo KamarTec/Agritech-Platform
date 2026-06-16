@@ -25,18 +25,3 @@ export function trustTier(score: number): { tier: TrustTier; label: string; clas
   if (score >= 25) return { tier: 'BRONZE', label: 'Bronze', classes: 'bg-orange-100 text-orange-700' }
   return { tier: 'NEW', label: 'New', classes: 'bg-gray-100 text-gray-500' }
 }
-
-export function cropEmoji(crop: string): string {
-  const c = crop.toLowerCase()
-  if (c.includes('tomato')) return '🍅'
-  if (c.includes('maize') || c.includes('corn')) return '🌽'
-  if (c.includes('onion')) return '🧅'
-  if (c.includes('pepper') || c.includes('chil')) return '🌶️'
-  if (c.includes('plantain') || c.includes('banana')) return '🍌'
-  if (c.includes('rice')) return '🍚'
-  if (c.includes('yam') || c.includes('potato') || c.includes('cassava')) return '🍠'
-  if (c.includes('mango')) return '🥭'
-  if (c.includes('pineapple')) return '🍍'
-  if (c.includes('cocoa')) return '🍫'
-  return '🌾'
-}

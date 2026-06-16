@@ -1,9 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { AdminMetrics, AdminPerson, DisputeView, Listing } from '@/lib/api'
 import { formatGhs } from '@/lib/format'
+import { CheckCircleIcon, PackageIcon, ShieldCheckIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 type Tab = 'overview' | 'disputes' | 'kyc' | 'listings'
@@ -127,7 +129,7 @@ function DisputesTab({ onError }: { onError: (m: string) => void }) {
 
   if (!disputes) return <Spinner />
   if (disputes.length === 0) {
-    return <Empty icon="✅" title="No open disputes" body="Disputed escrow orders will appear here for resolution." />
+    return <Empty icon={<CheckCircleIcon className="w-10 h-10" />} title="No open disputes" body="Disputed escrow orders will appear here for resolution." />
   }
 
   return (
@@ -194,7 +196,7 @@ function KycTab({ onError }: { onError: (m: string) => void }) {
 
   if (!people) return <Spinner />
   if (people.length === 0) {
-    return <Empty icon="🪪" title="No pending verifications" body="Users awaiting identity verification will appear here." />
+    return <Empty icon={<ShieldCheckIcon className="w-10 h-10" />} title="No pending verifications" body="Users awaiting identity verification will appear here." />
   }
 
   return (
@@ -250,7 +252,7 @@ function ListingsTab({ onError }: { onError: (m: string) => void }) {
 
   if (!listings) return <Spinner />
   if (listings.length === 0) {
-    return <Empty icon="📦" title="No listings" body="Marketplace listings will appear here for moderation." />
+    return <Empty icon={<PackageIcon className="w-10 h-10" />} title="No listings" body="Marketplace listings will appear here for moderation." />
   }
 
   return (
@@ -291,10 +293,10 @@ function ListingsTab({ onError }: { onError: (m: string) => void }) {
   )
 }
 
-function Empty({ icon, title, body }: { icon: string; title: string; body: string }) {
+function Empty({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
   return (
     <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-      <div className="text-4xl mb-3">{icon}</div>
+      <div className="flex justify-center mb-3 text-brand-500">{icon}</div>
       <h2 className="text-lg font-bold text-gray-900">{title}</h2>
       <p className="mt-1 text-gray-500">{body}</p>
     </div>

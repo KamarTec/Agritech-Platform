@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { Farm } from '@/lib/api'
 import { ImageUpload } from '@/components/image-upload'
+import { CheckCircleIcon, SproutIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -147,8 +148,8 @@ export default function FarmsPage() {
       {/* Empty state */}
       {farms !== null && farms.length === 0 && !error && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🌱</div>
-          <h2 className="text-lg font-bold text-gray-900">No farms yet</h2>
+          <SproutIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">No farms yet</h2>
           <p className="mt-1 text-gray-500">Add your first farm to start posting produce listings.</p>
           <button
             onClick={openCreate}
@@ -173,7 +174,7 @@ export default function FarmsPage() {
                     <h3 className="font-bold text-gray-900 truncate">{farm.name}</h3>
                     {farm.verified && (
                       <span className="shrink-0 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-full">
-                        ✓ Verified
+                        <CheckCircleIcon className="w-3.5 h-3.5" /> Verified
                       </span>
                     )}
                   </div>

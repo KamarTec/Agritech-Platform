@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, CampaignStatus, Farm, Investment, PaginatedCampaigns } from '@/lib/api'
 import { ImageUpload } from '@/components/image-upload'
+import { CheckCircleIcon, RocketIcon, SproutIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -180,16 +181,16 @@ function FarmerView() {
 
       {campaigns !== null && farms.length === 0 && !error && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🌱</div>
-          <h2 className="text-lg font-bold text-gray-900">You need a farm first</h2>
+          <SproutIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">You need a farm first</h2>
           <p className="mt-1 text-gray-500">Add a farm before launching a harvest campaign.</p>
         </div>
       )}
 
       {campaigns !== null && farms.length > 0 && campaigns.length === 0 && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🚀</div>
-          <h2 className="text-lg font-bold text-gray-900">No campaigns yet</h2>
+          <RocketIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">No campaigns yet</h2>
           <p className="mt-1 text-gray-500">Launch your first campaign and let investors fund your harvest.</p>
         </div>
       )}
@@ -464,8 +465,8 @@ function InvestorView() {
         <div className="mt-6">
           {browse.items.length === 0 && !error && (
             <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-              <div className="text-4xl mb-3">🌾</div>
-              <h2 className="text-lg font-bold text-gray-900">No campaigns right now</h2>
+              <SproutIcon className="w-10 h-10 mx-auto text-brand-500" />
+              <h2 className="mt-3 text-lg font-bold text-gray-900">No campaigns right now</h2>
               <p className="mt-1 text-gray-500">Farmers launch new harvest campaigns regularly — check back soon.</p>
             </div>
           )}
@@ -480,9 +481,9 @@ function InvestorView() {
                     >
                       {campaign.crop}
                     </Link>
-                    <p className="mt-0.5 text-sm text-gray-500">
+                    <p className="mt-0.5 text-sm text-gray-500 inline-flex items-center gap-1">
                       {campaign.farm.name} · {campaign.farm.location}
-                      {campaign.farm.verified && <span className="text-brand-600 font-bold"> ✓</span>}
+                      {campaign.farm.verified && <CheckCircleIcon className="w-4 h-4 text-brand-600" />}
                     </p>
                   </div>
                   <StatusBadge status={campaign.status} />

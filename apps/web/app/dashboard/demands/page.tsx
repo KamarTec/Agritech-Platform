@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Bid, DemandRequest, DemandStatus, InitializeOrderResult, PaginatedDemands } from '@/lib/api'
+import { CheckIcon, PackageIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -192,8 +193,8 @@ function RetailerView() {
 
       {demands !== null && demands.length === 0 && !error && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">📦</div>
-          <h2 className="text-lg font-bold text-gray-900">No requests yet</h2>
+          <PackageIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">No requests yet</h2>
           <p className="mt-1 text-gray-500">Post your first request and let farmers come to you.</p>
         </div>
       )}
@@ -491,8 +492,8 @@ function FarmerView() {
         <div className="mt-6">
           {open.items.length === 0 && !error && (
             <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-              <div className="text-4xl mb-3">📦</div>
-              <h2 className="text-lg font-bold text-gray-900">No open requests right now</h2>
+              <PackageIcon className="w-10 h-10 mx-auto text-brand-500" />
+              <h2 className="mt-3 text-lg font-bold text-gray-900">No open requests right now</h2>
               <p className="mt-1 text-gray-500">Check back soon — retailers post new requests regularly.</p>
             </div>
           )}
@@ -515,8 +516,8 @@ function FarmerView() {
                     </p>
                   </div>
                   {biddedDemandIds.has(demand.id) ? (
-                    <span className="px-4 py-2 rounded-xl bg-gray-100 text-gray-400 text-sm font-semibold">
-                      Bid placed ✓
+                    <span className="inline-flex items-center gap-1 px-4 py-2 rounded-xl bg-gray-100 text-gray-400 text-sm font-semibold">
+                      <CheckIcon className="w-4 h-4" /> Bid placed
                     </span>
                   ) : (
                     <button

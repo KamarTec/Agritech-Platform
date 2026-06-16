@@ -2,15 +2,24 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import axios from 'axios'
 
+export interface RecommendedProduct {
+  name: string
+  purpose: string
+  approxCostGhs?: number
+}
+
 export interface Diagnosis {
   healthy: boolean
   issue: string
   issueType: 'disease' | 'pest' | 'nutrient_deficiency' | 'healthy' | 'unknown'
   severity: 'none' | 'mild' | 'moderate' | 'severe'
+  urgency?: 'low' | 'medium' | 'high'
   confidencePct: number
   summary: string
+  immediateActions?: string[]
   treatment: string[]
   prevention: string[]
+  products?: RecommendedProduct[]
   estimatedCostGhs: number
 }
 
@@ -23,13 +32,18 @@ Respond ONLY with a JSON object in exactly this shape:
   "issue": "name of the disease/pest/deficiency, or 'Healthy plant'",
   "issueType": "disease" | "pest" | "nutrient_deficiency" | "healthy" | "unknown",
   "severity": "none" | "mild" | "moderate" | "severe",
+  "urgency": "low" | "medium" | "high" (how quickly the farmer must act; "low" when healthy),
   "confidencePct": number (0-100),
   "summary": "2-3 sentence plain-language explanation a farmer can understand",
+  "immediateActions": ["what to do TODAY to stop it spreading", ...] (empty array if healthy),
   "treatment": ["step 1", "step 2", ...] (practical steps, products available in Ghana),
   "prevention": ["tip 1", "tip 2", ...],
+  "products": [{ "name": "specific input/product to buy at a Ghanaian agrovet shop", "purpose": "what it does", "approxCostGhs": number }],
   "estimatedCostGhs": number (estimated total treatment cost in Ghanaian cedis)
 }
 
+Recommend only real products a farmer can buy at a local agrovet shop in Ghana. Use simple words.
+If the plant is healthy, set urgency to "low" and leave immediateActions, treatment and products as empty arrays.
 If the image is not a plant/crop, set issueType to "unknown" and explain in summary.`
 
 @Injectable()

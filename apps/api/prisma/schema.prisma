@@ -64,6 +64,7 @@ model Listing {
   farmId      String
   farm        Farm        @relation(fields: [farmId], references: [id], onDelete: Cascade)
   crop        String
+  category    String?     // vegetables | fruits | grains | roots | legumes | cash | livestock | herbs
   quantityKg  Float
   pricePerKg  Float
   harvestDate DateTime?
@@ -75,6 +76,7 @@ model Listing {
 
   @@index([farmId])
   @@index([crop])
+  @@index([category])
   @@index([status])
 }
 

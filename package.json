@@ -3,10 +3,7 @@
   "version": "0.1.0",
   "description": "Production-grade AgriTech platform connecting farmers, retailers, and investors",
   "private": true,
-  "engines": {
-    "node": "20.x"
-  },
-  "packageManager": "pnpm@9.15.4",
+  "packageManager": "pnpm@8.0.0",
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
@@ -15,7 +12,6 @@
     "type-check": "turbo run type-check"
   },
   "devDependencies": {
-    "next": "^14.0.4",
     "turbo": "^1.10.16",
     "typescript": "^5.3.3"
   },

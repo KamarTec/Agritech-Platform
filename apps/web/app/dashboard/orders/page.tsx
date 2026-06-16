@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { EscrowStatus, Transaction } from '@/lib/api'
+import { XIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const statusStyles: Record<EscrowStatus, string> = {
@@ -78,7 +79,7 @@ function OrdersContent() {
     if (!window.confirm('Confirm you received the produce? This releases the money to the farmer.')) return
     try {
       await api.post(`/transactions/${tx.id}/confirm-delivery`, {})
-      setNotice('Delivery confirmed — payment released to the farmer. 🎉')
+      setNotice('Delivery confirmed — payment released to the farmer.')
       await load()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not confirm delivery.')
@@ -105,7 +106,7 @@ function OrdersContent() {
       {notice && (
         <div className="mt-6 px-4 py-3 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-800 flex items-center justify-between gap-3">
           {notice}
-          <button onClick={() => setNotice(null)} className="text-brand-400 hover:text-brand-700 font-bold">✕</button>
+          <button onClick={() => setNotice(null)} aria-label="Dismiss" className="text-brand-400 hover:text-brand-700"><XIcon className="w-4 h-4" /></button>
         </div>
       )}
 

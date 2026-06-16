@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '@/lib/api'
 import type { Notification } from '@/lib/api'
 import { timeAgo } from '@/lib/format'
+import { BellIcon } from './icons'
 
 const POLL_MS = 45_000
 
@@ -114,7 +115,7 @@ export function NotificationBell() {
             )}
             {items !== null && items.length === 0 && (
               <div className="px-4 py-10 text-center text-sm text-gray-400">
-                <div className="text-2xl mb-2">🔔</div>
+                <BellIcon className="w-7 h-7 mx-auto mb-2 text-gray-300" />
                 You&apos;re all caught up.
               </div>
             )}

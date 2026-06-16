@@ -1,11 +1,16 @@
 import { Type } from 'class-transformer'
-import { IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator'
+import { IsIn, IsInt, IsOptional, IsString, IsUUID, Max, MaxLength, Min } from 'class-validator'
+import { LISTING_CATEGORIES } from '../listing-categories'
 
 export class QueryListingsDto {
   @IsOptional()
   @IsString()
   @MaxLength(100)
   crop?: string
+
+  @IsOptional()
+  @IsIn(LISTING_CATEGORIES)
+  category?: string
 
   @IsOptional()
   @IsUUID()

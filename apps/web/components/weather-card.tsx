@@ -1,12 +1,30 @@
 'use client'
 
+import type { FC } from 'react'
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { WeatherResult } from '@/lib/api'
+import {
+  CloudDrizzleIcon,
+  CloudFogIcon,
+  CloudIcon,
+  CloudLightningIcon,
+  CloudRainIcon,
+  SnowIcon,
+  SunIcon,
+  ThermometerIcon,
+} from './icons'
 
-const ICON: Record<string, string> = {
-  Clear: '☀️', Clouds: '☁️', Rain: '🌧️', Drizzle: '🌦️',
-  Thunderstorm: '⛈️', Snow: '❄️', Mist: '🌫️', Haze: '🌫️', Fog: '🌫️',
+const ICON: Record<string, FC<{ className?: string }>> = {
+  Clear: SunIcon,
+  Clouds: CloudIcon,
+  Rain: CloudRainIcon,
+  Drizzle: CloudDrizzleIcon,
+  Thunderstorm: CloudLightningIcon,
+  Snow: SnowIcon,
+  Mist: CloudFogIcon,
+  Haze: CloudFogIcon,
+  Fog: CloudFogIcon,
 }
 
 /** 5-day forecast for a farm's coordinates. Renders nothing useful gracefully when unavailable. */

@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { BoostResult, Farm, Listing, ListingStatus } from '@/lib/api'
 import { ImageUpload } from '@/components/image-upload'
+import { CropPicker } from '@/components/crop-picker'
+import { cropImage, cropCategoryLabel } from '@/lib/crops'
+import { PackageIcon, PencilIcon, PlusIcon, RocketIcon, SproutIcon, TrashIcon, XIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const BOOST_OPTIONS = [
@@ -27,12 +30,13 @@ const statusStyles: Record<ListingStatus, string> = {
 interface ListingForm {
   farmId: string
   crop: string
+  category: string
   quantityKg: string
   pricePerKg: string
   harvestDate: string
 }
 
-const emptyForm: ListingForm = { farmId: '', crop: '', quantityKg: '', pricePerKg: '', harvestDate: '' }
+const emptyForm: ListingForm = { farmId: '', crop: '', category: '', quantityKg: '', pricePerKg: '', harvestDate: '' }
 
 export default function ListingsPage() {
   const user = useUser()
@@ -41,6 +45,7 @@ export default function ListingsPage() {
   const [farms, setFarms] = useState<Farm[]>([])
   const [error, setError] = useState<string | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [editing, setEditing] = useState<Listing | null>(null)
   const [form, setForm] = useState<ListingForm>(emptyForm)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
@@ -68,7 +73,7 @@ export default function ListingsPage() {
     api
       .post(`/boosts/verify/${reference}`, {})
       .then(() => {
-        setNotice('Boost activated — your listing is now featured at the top of the marketplace. 🚀')
+        setNotice('Boost activated — your listing is now featured at the top of the marketplace.')
         window.history.replaceState({}, '', '/dashboard/listings')
         return load()
       })
@@ -93,25 +98,50 @@ export default function ListingsPage() {
   }
 
   function openCreate(): void {
+    setEditing(null)
     setForm({ ...emptyForm, farmId: farms[0]?.id ?? '' })
     setPhotoUrl(null)
     setFormError(null)
     setModalOpen(true)
   }
 
+  function openEdit(listing: Listing): void {
+    setEditing(listing)
+    setForm({
+      farmId: listing.farmId,
+      crop: listing.crop,
+      category: listing.category ?? '',
+      quantityKg: String(listing.quantityKg),
+      pricePerKg: String(listing.pricePerKg),
+      harvestDate: listing.harvestDate ? listing.harvestDate.slice(0, 10) : '',
+    })
+    setPhotoUrl(listing.photos?.[0] ?? null)
+    setFormError(null)
+    setModalOpen(true)
+  }
+
   async function handleSave(e: React.FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault()
+    if (!form.crop.trim()) {
+      setFormError('Please choose or type a crop.')
+      return
+    }
     setSaving(true)
     setFormError(null)
+    const payload = {
+      crop: form.crop.trim(),
+      ...(form.category ? { category: form.category } : {}),
+      quantityKg: Number(form.quantityKg),
+      pricePerKg: Number(form.pricePerKg),
+      ...(form.harvestDate ? { harvestDate: form.harvestDate } : {}),
+      ...(photoUrl ? { photos: [photoUrl] } : {}),
+    }
     try {
-      await api.post('/listings', {
-        farmId: form.farmId,
-        crop: form.crop.trim(),
-        quantityKg: Number(form.quantityKg),
-        pricePerKg: Number(form.pricePerKg),
-        ...(form.harvestDate ? { harvestDate: form.harvestDate } : {}),
-        ...(photoUrl ? { photos: [photoUrl] } : {}),
-      })
+      if (editing) {
+        await api.patch(`/listings/${editing.id}`, payload)
+      } else {
+        await api.post('/listings', { farmId: form.farmId, ...payload })
+      }
       setModalOpen(false)
       await load()
     } catch (err) {
@@ -168,16 +198,19 @@ export default function ListingsPage() {
         <button
           onClick={openCreate}
           disabled={farms.length === 0 && listings !== null}
-          className="shrink-0 px-5 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-600/20 transition-all"
+          className="shrink-0 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-600/20 transition-all"
         >
-          + Post listing
+          <PlusIcon className="w-5 h-5" />
+          Post listing
         </button>
       </div>
 
       {notice && (
         <div className="mt-6 px-4 py-3 rounded-xl bg-brand-50 border border-brand-200 text-sm text-brand-800 flex items-center justify-between gap-3">
           {notice}
-          <button onClick={() => setNotice(null)} className="text-brand-400 hover:text-brand-700 font-bold">✕</button>
+          <button onClick={() => setNotice(null)} aria-label="Dismiss" className="text-brand-400 hover:text-brand-700">
+            <XIcon className="w-4 h-4" />
+          </button>
         </div>
       )}
 
@@ -196,8 +229,8 @@ export default function ListingsPage() {
       {/* No farms yet */}
       {listings !== null && farms.length === 0 && !error && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🌱</div>
-          <h2 className="text-lg font-bold text-gray-900">You need a farm first</h2>
+          <SproutIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">You need a farm first</h2>
           <p className="mt-1 text-gray-500">Add a farm before posting produce listings.</p>
           <Link
             href="/dashboard/farms"
@@ -211,8 +244,8 @@ export default function ListingsPage() {
       {/* Empty listings */}
       {listings !== null && farms.length > 0 && listings.length === 0 && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🧺</div>
-          <h2 className="text-lg font-bold text-gray-900">No listings yet</h2>
+          <PackageIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">No listings yet</h2>
           <p className="mt-1 text-gray-500">Post your first produce listing — buyers are browsing.</p>
           <button
             onClick={openCreate}
@@ -230,6 +263,7 @@ export default function ListingsPage() {
             <thead>
               <tr className="border-b border-gray-100 text-gray-400 uppercase text-xs tracking-wide">
                 <th className="px-5 py-3.5 font-semibold">Crop</th>
+                <th className="px-5 py-3.5 font-semibold">Category</th>
                 <th className="px-5 py-3.5 font-semibold">Farm</th>
                 <th className="px-5 py-3.5 font-semibold">Quantity</th>
                 <th className="px-5 py-3.5 font-semibold">Price/kg</th>
@@ -240,7 +274,18 @@ export default function ListingsPage() {
             <tbody>
               {listings.map((listing) => (
                 <tr key={listing.id} className="border-b border-gray-50 last:border-0 hover:bg-gray-50/60">
-                  <td className="px-5 py-4 font-semibold text-gray-900">{listing.crop}</td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={listing.photos?.[0] ?? cropImage(listing.crop)}
+                        alt=""
+                        className="w-9 h-9 rounded-lg object-cover shrink-0"
+                      />
+                      <span className="font-semibold text-gray-900">{listing.crop}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4 text-gray-500">{cropCategoryLabel(listing.category)}</td>
                   <td className="px-5 py-4 text-gray-500">{listing.farm.name}</td>
                   <td className="px-5 py-4 text-gray-700">{listing.quantityKg.toLocaleString()} kg</td>
                   <td className="px-5 py-4 text-gray-700">GH₵ {listing.pricePerKg.toFixed(2)}</td>
@@ -251,13 +296,22 @@ export default function ListingsPage() {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => openEdit(listing)}
+                        title="Edit listing"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-gray-700 border border-gray-200 rounded-lg hover:border-brand-300 hover:bg-brand-50 transition-colors"
+                      >
+                        <PencilIcon className="w-3.5 h-3.5" />
+                        Edit
+                      </button>
                       {listing.status === 'ACTIVE' && (
                         <>
                           <button
                             onClick={() => { setBoostTarget(listing); setBoostDays(7) }}
-                            className="px-3 py-1.5 text-xs font-semibold text-amber-700 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-amber-700 border border-gray-200 rounded-lg hover:border-amber-300 hover:bg-amber-50 transition-colors"
                           >
-                            🚀 Boost
+                            <RocketIcon className="w-3.5 h-3.5" />
+                            Boost
                           </button>
                           <button
                             onClick={() => markStatus(listing, 'SOLD')}
@@ -277,9 +331,10 @@ export default function ListingsPage() {
                       )}
                       <button
                         onClick={() => handleDelete(listing)}
-                        className="px-3 py-1.5 text-xs font-semibold text-red-500 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 transition-colors"
+                        title="Delete listing"
+                        className="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-red-500 border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 transition-colors"
                       >
-                        Delete
+                        <TrashIcon className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </td>
@@ -290,12 +345,12 @@ export default function ListingsPage() {
         </div>
       )}
 
-      {/* Create modal */}
+      {/* Create / edit modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => !saving && setModalOpen(false)} />
-          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-gray-900">Post a listing</h2>
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-gray-900">{editing ? 'Edit listing' : 'Post a listing'}</h2>
 
             {formError && (
               <div className="mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">
@@ -308,34 +363,35 @@ export default function ListingsPage() {
                 <label htmlFor="listing-farm" className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Farm
                 </label>
-                <select
-                  id="listing-farm"
-                  required
-                  value={form.farmId}
-                  onChange={(e) => setForm({ ...form, farmId: e.target.value })}
-                  className={inputClasses}
-                >
-                  {farms.map((farm) => (
-                    <option key={farm.id} value={farm.id}>
-                      {farm.name} — {farm.location}
-                    </option>
-                  ))}
-                </select>
+                {editing ? (
+                  <div className="px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[15px] text-gray-600">
+                    {editing.farm.name}
+                  </div>
+                ) : (
+                  <select
+                    id="listing-farm"
+                    required
+                    value={form.farmId}
+                    onChange={(e) => setForm({ ...form, farmId: e.target.value })}
+                    className={inputClasses}
+                  >
+                    {farms.map((farm) => (
+                      <option key={farm.id} value={farm.id}>
+                        {farm.name} — {farm.location}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
+
               <div>
-                <label htmlFor="listing-crop" className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Crop
-                </label>
-                <input
-                  id="listing-crop"
-                  type="text"
-                  required
-                  placeholder="e.g. Tomatoes"
-                  value={form.crop}
-                  onChange={(e) => setForm({ ...form, crop: e.target.value })}
-                  className={inputClasses}
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Crop</label>
+                <CropPicker
+                  value={{ crop: form.crop, category: form.category }}
+                  onChange={(sel) => setForm({ ...form, crop: sel.crop, category: sel.category })}
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="listing-qty" className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -384,7 +440,7 @@ export default function ListingsPage() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Photo <span className="font-normal text-gray-400">(optional)</span>
+                  Your own photo <span className="font-normal text-gray-400">(optional — we use a picture for you otherwise)</span>
                 </label>
                 <ImageUpload purpose="listings" currentUrl={photoUrl} onUploaded={setPhotoUrl} label="Upload photo" />
               </div>
@@ -402,7 +458,7 @@ export default function ListingsPage() {
                   disabled={saving}
                   className="flex-1 py-3 rounded-xl bg-brand-600 text-white font-semibold hover:bg-brand-700 disabled:opacity-60 transition-colors"
                 >
-                  {saving ? 'Posting…' : 'Post listing'}
+                  {saving ? 'Saving…' : editing ? 'Save changes' : 'Post listing'}
                 </button>
               </div>
             </form>

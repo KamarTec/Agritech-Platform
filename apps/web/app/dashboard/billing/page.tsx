@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { MySubscription, SubscribeResult, SubscriptionPlan } from '@/lib/api'
 import { formatGhs } from '@/lib/format'
+import { CheckIcon } from '@/components/icons'
 
 export default function BillingPage() {
   return (
@@ -52,7 +53,7 @@ function BillingContent() {
       if (reference) {
         try {
           const me = await api.post<MySubscription>(`/subscriptions/verify/${reference}`, {})
-          if (me.status === 'ACTIVE') setNotice(`You're now on ${me.plan?.name}. 🎉`)
+          if (me.status === 'ACTIVE') setNotice(`You're now on ${me.plan?.name}.`)
         } catch {
           /* non-fatal; list reflects latest state */
         }
@@ -114,7 +115,7 @@ function BillingContent() {
                 <ul className="mt-4 space-y-2 flex-1">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-gray-600">
-                      <span className="text-brand-600 mt-0.5">✓</span>
+                      <CheckIcon className="w-4 h-4 mt-0.5 shrink-0 text-brand-600" />
                       {f}
                     </li>
                   ))}

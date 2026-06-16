@@ -47,17 +47,8 @@ pnpm dev
 ```
 
 This will start:
-- Frontend: http://localhost:3000 (Next.js dev)
+- Frontend: http://localhost:3000 (Next.js)
 - Backend: http://localhost:3001 (NestJS)
-
-For production on the VPS, set the frontend API URL before building, then run it with PM2 on port 3010:
-```bash
-cd /var/www/farmlink/apps/web
-export NEXT_PUBLIC_API_URL=https://api.yourdomain.com
-pnpm build
-pm2 start ../../deploy/ecosystem.config.cjs --env production
-pm2 save
-```
 
 **Frontend Console Output:**
 ```
@@ -89,10 +80,6 @@ NestJS API running on http://localhost:3001
 - `apps/web/app/page.tsx` - Home page
 - `apps/web/app/layout.tsx` - Layout setup
 - `apps/web/tailwind.config.ts` - Tailwind configuration
-
-**Deployment**
-- `deploy/ecosystem.config.cjs` - PM2 config for the frontend
-- `deploy/nginx.conf` - Reverse proxy for `app.` and `api.` subdomains
 
 **Backend**
 - `apps/api/src/auth/` - Authentication module

@@ -5,7 +5,9 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { InitializeOrderResult, ListingDetail } from '@/lib/api'
-import { cropEmoji, formatDate, formatGhs, timeAgo } from '@/lib/format'
+import { formatDate, formatGhs, timeAgo } from '@/lib/format'
+import { cropImage } from '@/lib/crops'
+import { CheckCircleIcon, ShieldCheckIcon } from '@/components/icons'
 import { TrustBadge } from '@/components/trust-badge'
 import { MessageButton } from '@/components/message-button'
 import { useUser } from '../../user-context'
@@ -90,14 +92,12 @@ export default function ListingDetailPage() {
         {/* Main column */}
         <div className="space-y-6">
           <div className="rounded-2xl bg-white border border-gray-200 overflow-hidden">
-            {listing.photos?.[0] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={listing.photos[0]} alt={listing.crop} className="h-56 w-full object-cover" />
-            ) : (
-              <div className="h-44 bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center">
-                <span className="text-7xl">{cropEmoji(listing.crop)}</span>
-              </div>
-            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={listing.photos?.[0] ?? cropImage(listing.crop)}
+              alt={listing.crop}
+              className="h-56 w-full object-cover"
+            />
             <div className="p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -143,8 +143,10 @@ export default function ListingDetailPage() {
                   href={`/dashboard/farms/${listing.farm.id}`}
                   className="font-bold text-gray-900 hover:text-brand-700 transition-colors"
                 >
-                  {listing.farm.name}
-                  {listing.farm.verified && <span className="text-brand-600"> ✓</span>}
+                  <span className="inline-flex items-center gap-1">
+                    {listing.farm.name}
+                    {listing.farm.verified && <CheckCircleIcon className="w-4 h-4 text-brand-600" />}
+                  </span>
                 </Link>
                 <p className="mt-0.5 text-sm text-gray-500">{listing.farm.location}</p>
                 <p className="mt-2 text-sm text-gray-600 flex flex-wrap items-center gap-2">
@@ -222,9 +224,12 @@ export default function ListingDetailPage() {
                   )}
                 </div>
 
-                <div className="rounded-xl bg-brand-50 border border-brand-200 px-4 py-3 text-xs text-brand-800">
-                  🛡️ Escrow protected: you pay now via Paystack, the farmer only receives the money
-                  after you confirm delivery.
+                <div className="rounded-xl bg-brand-50 border border-brand-200 px-4 py-3 text-xs text-brand-800 flex items-start gap-2">
+                  <ShieldCheckIcon className="w-4 h-4 shrink-0 mt-0.5 text-brand-600" />
+                  <span>
+                    Escrow protected: you pay now via Paystack, the farmer only receives the money
+                    after you confirm delivery.
+                  </span>
                 </div>
 
                 <button

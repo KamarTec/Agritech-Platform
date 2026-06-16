@@ -34,7 +34,7 @@ export default function OverviewPage() {
   return (
     <div className="max-w-5xl">
       <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">
-        Welcome back, {firstName} 👋
+        Welcome back, {firstName}
       </h1>
       <p className="mt-1 text-gray-500">
         {user.role === 'FARMER' && 'Manage your farms and listings, and reach buyers directly.'}

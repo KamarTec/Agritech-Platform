@@ -62,6 +62,7 @@ export class ListingsService {
       data: {
         farmId: dto.farmId,
         crop: dto.crop.trim(),
+        ...(dto.category ? { category: dto.category } : {}),
         quantityKg: dto.quantityKg,
         pricePerKg: dto.pricePerKg,
         harvestDate: dto.harvestDate ? new Date(dto.harvestDate) : null,
@@ -78,6 +79,7 @@ export class ListingsService {
     const where: Prisma.ListingWhereInput = {
       status: 'ACTIVE',
       ...(query.farmId ? { farmId: query.farmId } : {}),
+      ...(query.category ? { category: query.category } : {}),
       ...(query.crop
         ? { crop: { contains: query.crop, mode: 'insensitive' } }
         : {}),
@@ -139,6 +141,7 @@ export class ListingsService {
       where: { id },
       data: {
         ...(dto.crop !== undefined ? { crop: dto.crop.trim() } : {}),
+        ...(dto.category !== undefined ? { category: dto.category } : {}),
         ...(dto.quantityKg !== undefined ? { quantityKg: dto.quantityKg } : {}),
         ...(dto.pricePerKg !== undefined ? { pricePerKg: dto.pricePerKg } : {}),
         ...(dto.harvestDate !== undefined ? { harvestDate: new Date(dto.harvestDate) } : {}),
