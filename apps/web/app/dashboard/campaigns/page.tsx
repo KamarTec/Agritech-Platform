@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Campaign, CampaignStatus, Farm, Investment, PaginatedCampaigns } from '@/lib/api'
 import { ImageUpload } from '@/components/image-upload'
-import { CheckCircleIcon, RocketIcon, SproutIcon } from '@/components/icons'
+import { BriefcaseIcon, CheckCircleIcon, RocketIcon, SproutIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -557,8 +557,8 @@ function InvestorView() {
 
           {portfolio.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-              <div className="text-4xl mb-3">💼</div>
-              <h2 className="text-lg font-bold text-gray-900">No investments yet</h2>
+              <BriefcaseIcon className="w-10 h-10 mx-auto text-brand-500" />
+              <h2 className="mt-3 text-lg font-bold text-gray-900">No investments yet</h2>
               <p className="mt-1 text-gray-500">Browse active campaigns and back your first harvest.</p>
             </div>
           )}

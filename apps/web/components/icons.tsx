@@ -3,7 +3,7 @@ import type { ReactNode, SVGProps } from 'react'
 /**
  * Lightweight inline-SVG icon set (lucide-style, 24x24, stroke = currentColor).
  * Matches the project's existing hand-rolled SVG convention — no icon-library
- * dependency. Size with Tailwind `h-*/w-*` and colour with `text-*`.
+ * dependency. Size with Tailwind height/width classes and colour with text classes.
  */
 type IconProps = SVGProps<SVGSVGElement>
 

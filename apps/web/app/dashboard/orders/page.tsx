@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { EscrowStatus, Transaction } from '@/lib/api'
-import { XIcon } from '@/components/icons'
+import { ReceiptIcon, XIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const statusStyles: Record<EscrowStatus, string> = {
@@ -120,8 +120,8 @@ function OrdersContent() {
 
       {orders !== null && orders.length === 0 && !error && (
         <div className="mt-8 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🧾</div>
-          <h2 className="text-lg font-bold text-gray-900">No orders yet</h2>
+          <ReceiptIcon className="w-10 h-10 mx-auto text-brand-500" />
+          <h2 className="mt-3 text-lg font-bold text-gray-900">No orders yet</h2>
           <p className="mt-1 text-gray-500">
             Order produce from the marketplace — your escrow-protected purchases will appear here.
           </p>

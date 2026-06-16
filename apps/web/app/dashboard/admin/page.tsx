@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { AdminMetrics, AdminPerson, DisputeView, Listing } from '@/lib/api'
 import { formatGhs } from '@/lib/format'
-import { CheckCircleIcon, PackageIcon, ShieldCheckIcon } from '@/components/icons'
+import { CheckCircleIcon, LockIcon, PackageIcon, ShieldCheckIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 type Tab = 'overview' | 'disputes' | 'kyc' | 'listings'
@@ -19,8 +19,8 @@ export default function AdminPage() {
     return (
       <div className="max-w-3xl">
         <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-          <div className="text-4xl mb-3">🔒</div>
-          <h1 className="text-lg font-bold text-gray-900">Admins only</h1>
+          <LockIcon className="w-10 h-10 mx-auto text-gray-400" />
+          <h1 className="mt-3 text-lg font-bold text-gray-900">Admins only</h1>
           <p className="mt-1 text-gray-500">This area is restricted to platform administrators.</p>
         </div>
       </div>

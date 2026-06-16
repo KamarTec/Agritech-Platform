@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import type { Bid, DemandRequest, DemandStatus, InitializeOrderResult, PaginatedDemands } from '@/lib/api'
-import { CheckIcon, PackageIcon } from '@/components/icons'
+import { CheckIcon, HandshakeIcon, PackageIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const inputClasses =
@@ -544,8 +544,8 @@ function FarmerView() {
         <div className="mt-6">
           {myBids.length === 0 && (
             <div className="rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
-              <div className="text-4xl mb-3">🤝</div>
-              <h2 className="text-lg font-bold text-gray-900">No bids yet</h2>
+              <HandshakeIcon className="w-10 h-10 mx-auto text-brand-500" />
+              <h2 className="mt-3 text-lg font-bold text-gray-900">No bids yet</h2>
               <p className="mt-1 text-gray-500">Browse open requests and place your first bid.</p>
             </div>
           )}

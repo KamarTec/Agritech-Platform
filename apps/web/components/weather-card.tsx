@@ -66,16 +66,19 @@ export function WeatherCard({ lat, lng }: { lat: number | null; lng: number | nu
         <>
           <p className="mt-1 text-sm text-gray-500">{data.location}</p>
           <div className="mt-4 grid grid-cols-3 sm:grid-cols-5 gap-2">
-            {data.days.map((d) => (
-              <div key={d.date} className="rounded-xl bg-gray-50 py-3 text-center">
-                <div className="text-xs text-gray-400">
-                  {new Date(d.date).toLocaleDateString('en-GB', { weekday: 'short' })}
+            {data.days.map((d) => {
+              const Cond = ICON[d.condition] ?? ThermometerIcon
+              return (
+                <div key={d.date} className="rounded-xl bg-gray-50 py-3 text-center">
+                  <div className="text-xs text-gray-400">
+                    {new Date(d.date).toLocaleDateString('en-GB', { weekday: 'short' })}
+                  </div>
+                  <Cond className="w-7 h-7 mx-auto my-1 text-brand-600" />
+                  <div className="text-sm font-semibold text-gray-900">{d.tempMax}°</div>
+                  <div className="text-xs text-gray-400">{d.tempMin}°</div>
                 </div>
-                <div className="text-2xl">{ICON[d.condition] ?? '🌡️'}</div>
-                <div className="text-sm font-semibold text-gray-900">{d.tempMax}°</div>
-                <div className="text-xs text-gray-400">{d.tempMin}°</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </>
       )}

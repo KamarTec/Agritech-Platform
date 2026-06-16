@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { api, ApiError } from '@/lib/api'
 import type { Message, ThreadView } from '@/lib/api'
 import { timeAgo } from '@/lib/format'
+import { MailIcon, MessageCircleIcon } from '@/components/icons'
 import { useUser } from '../user-context'
 
 const THREADS_POLL_MS = 10_000
@@ -72,7 +73,7 @@ function MessagesContent() {
           {threads === null && <div className="p-6"><Spinner /></div>}
           {threads !== null && threads.length === 0 && (
             <div className="p-6 text-center text-sm text-gray-400">
-              <div className="text-2xl mb-2">💬</div>
+              <MessageCircleIcon className="w-7 h-7 mx-auto mb-2 text-gray-300" />
               No conversations yet. Start one from a listing, campaign, or farm profile.
             </div>
           )}
@@ -117,7 +118,7 @@ function MessagesContent() {
           ) : (
             <div className="flex-1 flex items-center justify-center text-center text-gray-400 p-6">
               <div>
-                <div className="text-3xl mb-2">✉️</div>
+                <MailIcon className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                 Select a conversation to start chatting.
               </div>
             </div>
