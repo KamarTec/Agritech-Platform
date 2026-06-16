@@ -5,8 +5,8 @@ module.exports = {
     {
       name: 'farmlink-web',
       cwd: path.resolve(__dirname, '../apps/web'),
-      script: './node_modules/next/dist/bin/next',
-      args: 'start -p 3010',
+      script: 'pnpm',
+      args: 'exec next start -p 3010',
       exec_mode: 'fork',
       instances: 1,
       autorestart: true,
