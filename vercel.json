@@ -1,5 +1,5 @@
 {
   "framework": "nextjs",
-  "installCommand": "pnpm install --filter @farmlink/web...",
-  "buildCommand": "pnpm --filter @farmlink/web build"
+  "installCommand": "npm install --prefix apps/web",
+  "buildCommand": "npm run build --prefix apps/web"
 }
