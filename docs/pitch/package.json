@@ -1,0 +1,12 @@
+{
+  "name": "farmlink-pitch",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Generates the FarmLink pitch deck (.pptx) from generate-deck.js",
+  "scripts": {
+    "build": "node generate-deck.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^3.12.0"
+  }
+}
