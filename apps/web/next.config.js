@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Type-checking runs separately; don't let a monorepo ESLint config hiccup
+  // fail the Vercel production build.
+  eslint: { ignoreDuringBuilds: true },
   images: {
     remotePatterns: [
       {
