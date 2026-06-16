@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Production-grade AgriTech platform connecting farmers, retailers, and investors",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "packageManager": "pnpm@9.15.4",
   "scripts": {
     "dev": "turbo run dev --parallel",
